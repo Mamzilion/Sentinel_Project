@@ -8,7 +8,7 @@ Sentinel est une solution intégrée de supervision d'examens en réseau local.
 - **/sentinel-dashboard** : Interface Web de supervision en temps réel pour les enseignants.
 
 ## 🛠️ Installation rapide
-1. Cloner le projet : `git clone [URL_DU_REPO]`
+1. Cloner le projet : `git clone https://github.com/Mamzilion/Sentinel_Project.git`
 2. Installer les dépendances serveur : `cd sentinel-server && npm install`
 3. Lancer l'agent : `cd sentinel-agent && python main.py`
 
