@@ -15,48 +15,48 @@ def demarrer_surveillance():
     """Lance tous les threads de surveillance"""
     
     def callback_alerte(data):
-        print(f"🚨 ALERTE : {data}")
+        print(f" ALERTE : {data}")
     
     # Thread 1 : Processus
     t1 = threading.Thread(target=surveiller_processus, daemon=True)
     t1.start()
-    print("🛡️ Surveillance processus démarrée")
+    print(" Surveillance processus démarrée")
     
     # Thread 2 : USB
     t2 = threading.Thread(target=surveiller_usb, args=(callback_alerte,), daemon=True)
     t2.start()
-    print("🛡️ Surveillance USB démarrée")
+    print(" Surveillance USB démarrée")
     
     # Thread 3 : Focus (mode kiosque)
     t3 = threading.Thread(target=surveiller_focus, args=(callback_alerte,), daemon=True)
     t3.start()
-    print("🛡️ Mode kiosque (focus) démarré")
+    print(" Mode kiosque (focus) démarré")
 
 def nettoyer():
     """Nettoie avant de quitter"""
-    print("\n🛑 Arrêt de l'agent Sentinel...")
+    print("\n Arrêt de l'agent Sentinel...")
     desactiver_isolation()
-    print("👋 Agent arrêté")
+    print(" Agent arrêté")
 
 if __name__ == "__main__":
     print("=" * 50)
-    print("🛡️ AGENT SENTINEL - Version Windows")
+    print(" AGENT SENTINEL - Version Windows")
     print("=" * 50)
     
     from config import DOSSIER_TRAVAIL
     os.makedirs(DOSSIER_TRAVAIL, exist_ok=True)
     
     try:
-        print("\n🔒 Activation isolation réseau...")
+        print("\n Activation isolation réseau...")
         activer_isolation()
         
-        print("\n🚀 Lancement surveillances...")
+        print("\n Lancement surveillances...")
         demarrer_surveillance()
         
-        print("\n🔌 Connexion au serveur...")
+        print("\n Connexion au serveur...")
         asyncio.run(connecter(TOKEN_JWT))
         
     except KeyboardInterrupt:
-        print("\n\n⚠️ Interruption utilisateur")
+        print("\n\n Interruption utilisateur")
     finally:
         nettoyer()
