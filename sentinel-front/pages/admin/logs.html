@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Journal de Sécurité | ProctorEye Admin</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <style>
+        body { display: flex; min-height: 100vh; background-color: #f1f5f9; }
+
+        .main-content { flex-grow: 1; padding: 2rem; }
+
+        /* Filtres de sévérité */
+        .log-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .filter-chip {
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border: 1px solid #cbd5e1;
+            background: white;
+            transition: var(--transition);
+        }
+
+        .filter-chip.active[data-type="critical"] { background: var(--danger-color); color: white; border-color: var(--danger-color); }
+        .filter-chip.active[data-type="warning"] { background: var(--warning-color); color: white; border-color: var(--warning-color); }
+
+        /* Table des Logs */
+        .log-container {
+            background: white;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .log-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .log-table th {
+            background: #f8fafc;
+            padding: 1rem;
+            text-align: left;
+            font-size: 0.8rem;
+            color: var(--secondary-color);
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .log-row {
+            border-bottom: 1px solid #f1f5f9;
+            transition: var(--transition);
+        }
+
+        .log-row:hover { background: #fdfdfd; }
+
+        .log-cell {
+            padding: 1rem;
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        /* Badges de sévérité */
+        .severity {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .sev-critical { background: #fee2e2; color: #991b1b; }
+        .sev-warning { background: #fef3c7; color: #92400e; }
+        .sev-info { background: #e0f2fe; color: #075985; }
+
+        .log-time {
+            font-family: 'Courier New', monospace;
+            color: var(--secondary-color);
+            white-space: nowrap;
+        }
+
+        .log-message { font-weight: 500; }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar" style="width: 250px; background: #1e293b; color: white; padding: 1.5rem;">
+        <h2 class="font-black">ADMIN <span class="font-thin">PANEL</span></h2>
+        <ul style="list-style: none; margin-top: 2rem; padding: 0;">
+            <li style="margin-bottom: 1rem;"><a href="manage-users.html" style="color: white; text-decoration: none;" class="font-normal">👥 Étudiants & MAC</a></li>
+            <li style="padding: 10px; background: var(--primary-color); border-radius: 5px; margin-bottom: 1rem;">🛡️ Logs de Sécurité</li>
+            <li style="margin-bottom: 1rem;"><a href="../../index.html" style="color: white; text-decoration: none;" class="font-normal">🚪 Déconnexion</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header style="margin-bottom: 2rem;">
+            <h1 class="font-black" style="font-size: 2.2rem;">Journal de Sécurité Global</h1>
+            <p class="font-normal" style="color: var(--text-muted);">Historique complet des événements système et tentatives d'intrusion.</p>
+        </header>
+
+        <div class="log-filters">
+            <button class="filter-chip active">Tous les logs</button>
+            <button class="filter-chip" data-type="critical">Critique</button>
+            <button class="filter-chip" data-type="warning">Avertissements</button>
+            <button class="filter-chip">Infos</button>
+        </div>
+
+        <div class="log-container">
+            <table class="log-table">
+                <thead>
+                    <tr>
+                        <th>Horodatage</th>
+                        <th>Sévérité</th>
+                        <th>Utilisateur / MAC</th>
+                        <th>Événement</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="log-row">
+                        <td class="log-cell log-time">2024-05-22 14:32:10</td>
+                        <td class="log-cell"><span class="severity sev-critical">Critique</span></td>
+                        <td class="log-cell font-bold">21U1234 (00:1A:...)</td>
+                        <td class="log-cell log-message">Détection de smartphone via webcam.</td>
+                        <td class="log-cell"><button class="btn font-normal" style="padding: 4px 10px; font-size: 0.7rem; background: #f1f5f9;">Détails</button></td>
+                    </tr>
+                    <tr class="log-row">
+                        <td class="log-cell log-time">2024-05-22 14:30:05</td>
+                        <td class="log-cell"><span class="severity sev-warning">Warning</span></td>
+                        <td class="log-cell font-bold">21U0099 (A1:B2:...)</td>
+                        <td class="log-cell log-message">Perte de focus fenêtre (Alt+Tab).</td>
+                        <td class="log-cell"><button class="btn font-normal" style="padding: 4px 10px; font-size: 0.7rem; background: #f1f5f9;">Détails</button></td>
+                    </tr>
+                    <tr class="log-row">
+                        <td class="log-cell log-time">2024-05-22 14:00:00</td>
+                        <td class="log-cell"><span class="severity sev-info">Info</span></td>
+                        <td class="log-cell font-bold">Système</td>
+                        <td class="log-cell log-message">Début de l'examen "Algorithmique Avancée".</td>
+                        <td class="log-cell">---</td>
+                    </tr>
+                    <tr class="log-row">
+                        <td class="log-cell log-time">2024-05-22 13:55:12</td>
+                        <td class="log-cell"><span class="severity sev-info">Info</span></td>
+                        <td class="log-cell font-bold">Admin</td>
+                        <td class="log-cell log-message">Importation de la liste CSV (45 étudiants).</td>
+                        <td class="log-cell">---</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+</body>
+</html>

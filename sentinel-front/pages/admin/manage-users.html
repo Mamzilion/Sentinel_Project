@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration Système | ProctorEye</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <style>
+        body { display: flex; min-height: 100vh; background-color: #f1f5f9; }
+
+        .main-content { flex-grow: 1; padding: 2rem; }
+
+        /* Zone d'Importation */
+        .import-zone {
+            border: 2px dashed var(--primary-color);
+            background: #eff6ff;
+            padding: 3rem;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            margin-bottom: 2rem;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .import-zone:hover {
+            background: #dbeafe;
+        }
+
+        /* Tableau de gestion */
+        .admin-table-container {
+            background: white;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-dark);
+            color: white;
+            padding: 1.2rem;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 1rem 1.2rem;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.9rem;
+        }
+
+        tr:hover { background-color: #f8fafc; }
+
+        .mac-badge {
+            font-family: 'Courier New', monospace;
+            background: #f1f5f9;
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .action-btn {
+            border: none;
+            background: none;
+            cursor: pointer;
+            padding: 5px;
+            font-size: 1.1rem;
+        }
+
+        /* Barre de recherche admin */
+        .admin-tools {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+
+        .search-bar {
+            flex-grow: 1;
+            max-width: 400px;
+            padding: 0.7rem;
+            border: 1px solid #cbd5e1;
+            border-radius: var(--radius-md);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar" style="width: 250px; background: #1e293b; color: white; padding: 1.5rem;">
+        <h2 class="font-black">ADMIN <span class="font-thin">PANEL</span></h2>
+        <ul style="list-style: none; margin-top: 2rem; padding: 0;">
+            <li style="padding: 10px; background: var(--primary-color); border-radius: 5px; margin-bottom: 1rem;">👥 Étudiants & MAC</li>
+            <li style="margin-bottom: 1rem;"><a href="#" style="color: white; text-decoration: none;" class="font-normal">🛡️ Logs de Sécurité</a></li>
+            <li style="margin-bottom: 1rem;"><a href="../../index.html" style="color: white; text-decoration: none;" class="font-normal">🚪 Déconnexion</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header style="margin-bottom: 2rem;">
+            <h1 class="font-black" style="font-size: 2.2rem;">Gestion des Utilisateurs</h1>
+            <p class="font-normal" style="color: var(--text-muted);">Associez les matricules aux adresses MAC et gérez la base de données.</p>
+        </header>
+
+        <section class="import-zone font-normal" id="dropZone">
+            <span style="font-size: 2.5rem;">📁</span>
+            <h3 class="font-bold">Importer une liste d'étudiants (CSV)</h3>
+            <p>Glissez-déposez votre fichier ici ou <span style="color: var(--primary-color); text-decoration: underline;">parcourez vos fichiers</span></p>
+            <input type="file" id="fileInput" hidden accept=".csv">
+        </section>
+
+        <div class="admin-tools">
+            <input type="text" class="search-bar font-normal" placeholder="Rechercher un matricule ou une MAC...">
+            <button class="btn btn-primary font-bold">+ Ajouter Manuellement</button>
+        </div>
+
+        <div class="admin-table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="font-bold">Matricule</th>
+                        <th class="font-bold">Nom Complet</th>
+                        <th class="font-bold">Adresse MAC</th>
+                        <th class="font-bold">Statut</th>
+                        <th class="font-bold">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="font-bold">21U1234</td>
+                        <td>Jean Dupont</td>
+                        <td><span class="mac-badge">00:1A:2B:3C:4D:5E</span></td>
+                        <td><span class="status-indicator status-online"></span> Approuvé</td>
+                        <td>
+                            <button class="action-btn">✏️</button>
+                            <button class="action-btn">🗑️</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-bold">21U0099</td>
+                        <td>Alice Traoré</td>
+                        <td><span class="mac-badge">A1:B2:C3:D4:E5:F6</span></td>
+                        <td><span class="status-indicator status-online"></span> Approuvé</td>
+                        <td>
+                            <button class="action-btn">✏️</button>
+                            <button class="action-btn">🗑️</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-bold">21U0556</td>
+                        <td>Marc Lévy</td>
+                        <td><span class="mac-badge">En attente...</span></td>
+                        <td><span class="status-indicator status-offline"></span> Non lié</td>
+                        <td>
+                            <button class="action-btn">✏️</button>
+                            <button class="action-btn">🗑️</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        // Simulation Drag & Drop
+        const dropZone = document.getElementById('dropZone');
+        
+        dropZone.onclick = () => document.getElementById('fileInput').click();
+
+        dropZone.ondragover = (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = "var(--success-color)";
+            dropZone.style.background = "#f0fdf4";
+        };
+
+        dropZone.ondragleave = () => {
+            dropZone.style.borderColor = "var(--primary-color)";
+            dropZone.style.background = "#eff6ff";
+        };
+
+        dropZone.ondrop = (e) => {
+            e.preventDefault();
+            const file = e.dataTransfer.files[0];
+            alert("Fichier reçu : " + file.name + " (Envoi à l'API en cours...)");
+            dropZone.style.borderColor = "var(--primary-color)";
+        };
+    </script>
+</body>
+</html>

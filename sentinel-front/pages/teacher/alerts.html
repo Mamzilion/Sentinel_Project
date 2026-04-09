@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galerie des Alertes | ProctorEye</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <style>
+        body { display: flex; min-height: 100vh; background-color: var(--bg-light); }
+
+        .main-content { flex-grow: 1; padding: 2rem; }
+
+        /* Filtres et Header */
+        .alerts-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 2.5rem;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Grille des captures */
+        .alerts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .alert-card {
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 2px solid transparent;
+        }
+
+        .alert-card.critical {
+            border-color: var(--danger-color);
+        }
+
+        .photo-wrapper {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            background: #000;
+        }
+
+        .alert-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .alert-card:hover .alert-photo {
+            transform: scale(1.05);
+            opacity: 0.8;
+        }
+
+        .alert-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            color: white;
+            font-size: 0.8rem;
+        }
+
+        .alert-info {
+            padding: 1.5rem;
+        }
+
+        .student-id {
+            color: var(--primary-color);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .alert-reason {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .timestamp {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar" style="width: 250px; background: var(--bg-dark); color: white; padding: 1.5rem;">
+        <h2 class="font-black">PROCTOR <span class="font-thin">EYE</span></h2>
+        <ul style="list-style: none; margin-top: 2rem;">
+            <li style="margin-bottom: 1rem;"><a href="dashboard.html" style="color: white; text-decoration: none;">📊 Dashboard</a></li>
+            <li style="margin-bottom: 1rem;"><a href="create-exam.html" style="color: white; text-decoration: none;">📝 Créer Examen</a></li>
+            <li style="padding: 10px; background: var(--primary-color); border-radius: 5px;">📸 Alertes Photos</li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header class="alerts-header">
+            <div>
+                <h1 class="font-black" style="font-size: 2.2rem;">Journal des Alertes</h1>
+                <p class="font-normal" style="color: var(--text-muted);">Preuves visuelles capturées par l'agent de surveillance.</p>
+            </div>
+            
+            <div class="filter-group">
+                <select class="btn font-normal" style="background: white; border: 1px solid #cbd5e1;">
+                    <option>Toutes les alertes</option>
+                    <option>Critique (Téléphone)</option>
+                    <option>Absence de visage</option>
+                    <option>Multiple visages</option>
+                </select>
+                <button class="btn btn-primary">Actualiser</button>
+            </div>
+        </header>
+
+        <div class="alerts-grid">
+            <div class="card alert-card critical">
+                <div class="photo-wrapper">
+                    <img src="https://via.placeholder.com/400x300/333/fff?text=Capture+Smartphone" alt="Preuve" class="alert-photo">
+                    <div class="alert-overlay">Confiance: 98.4%</div>
+                </div>
+                <div class="alert-info">
+                    <span class="student-id font-bold">MATRICULE: 21U1234</span>
+                    <h3 class="alert-reason font-black">Objet interdit : Smartphone</h3>
+                    <div class="timestamp">
+                        <span>🕒</span> 14:32:10 - Question n°4
+                    </div>
+                </div>
+            </div>
+
+            <div class="card alert-card">
+                <div class="photo-wrapper">
+                    <img src="https://via.placeholder.com/400x300/444/fff?text=Visage+Absent" alt="Preuve" class="alert-photo">
+                    <div class="alert-overlay">Confiance: 100%</div>
+                </div>
+                <div class="alert-info">
+                    <span class="student-id font-bold">MATRICULE: 21U0099</span>
+                    <h3 class="alert-reason font-black">Absence de l'étudiant</h3>
+                    <div class="timestamp">
+                        <span>🕒</span> 14:45:05 - Question n°7
+                    </div>
+                </div>
+            </div>
+
+            <div class="card alert-card" style="border-color: var(--warning-color);">
+                <div class="photo-wrapper">
+                    <img src="https://via.placeholder.com/400x300/555/fff?text=Multiple+Faces" alt="Preuve" class="alert-photo">
+                    <div class="alert-overlay">Confiance: 85.2%</div>
+                </div>
+                <div class="alert-info">
+                    <span class="student-id font-bold">MATRICULE: 21U0556</span>
+                    <h3 class="alert-reason font-black">Détection multiple visages</h3>
+                    <div class="timestamp">
+                        <span>🕒</span> 15:02:12 - Question n°12
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>
