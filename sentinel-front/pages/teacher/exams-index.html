@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Examens | ProctorEye</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <style>
+        body { display: flex; min-height: 100vh; background-color: #f8fafc; }
+        .main-content { flex-grow: 1; padding: 2rem; overflow-y: auto; }
+
+        /* Filtres de statut */
+        .status-tabs {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+        }
+
+        .tab {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            font-weight: bold;
+            color: var(--text-muted);
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .tab.active { color: var(--primary-color); }
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary-color);
+        }
+
+        /* Grille d'examens */
+        .exams-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .exam-card {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border-left: 6px solid #cbd5e1;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .exam-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+        
+        /* États visuels */
+        .exam-card.ongoing { border-left-color: #22c55e; } 
+        .exam-card.finished { border-left-color: #3b82f6; } 
+        .exam-card.upcoming { border-left-color: #f59e0b; }
+
+        .exam-meta { 
+            font-size: 0.75rem; 
+            font-weight: bold; 
+            color: var(--primary-color); 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .exam-title { font-size: 1.3rem; font-weight: 900; margin-bottom: 0.5rem; color: var(--bg-dark); }
+        
+        .exam-details {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .info-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+
+        .btn-action {
+            margin-top: auto;
+            display: block;
+            text-align: center;
+            padding: 0.8rem;
+            border-radius: 8px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .btn-results { background: var(--bg-dark); color: white; }
+        .btn-results:hover { background: #000; }
+        
+        .btn-live { background: var(--danger-color); color: white; animation: pulse 2s infinite; }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar" style="width: 260px; background: var(--bg-dark); color: white; padding: 1.5rem;">
+        <h2 class="font-black" style="margin-bottom: 2rem;">PROCTOR <span class="font-thin">EYE</span></h2>
+        <ul class="nav-menu" style="list-style: none; padding: 0;">
+           
+            <li class="nav-item" style="margin-bottom: 1rem;"><a href="dashboard.html" style="color:white; text-decoration:none;">📊 Dashboard</a></li>
+             <li class="nav-item" style="padding: 12px; background: var(--primary-color); border-radius: 8px; margin-bottom: 10px;">
+                <a href="exams-index.html" style="color:white; text-decoration:none; font-weight: bold;">📚 Mes Examens</a>
+            </li>
+            <li class="nav-item" style="margin-bottom: 1rem;"><a href="create-exam.html" style="color:white; text-decoration:none;">📝 Créer Examen</a></li>
+            <li class="nav-item" style="margin-bottom: 1rem;"><a href="students-list.html" style="color:white; text-decoration:none;">👥 Liste Étudiants</a></li>
+            <li class="nav-item"><a href="alerts.html" style="color:inherit; text-decoration:none;">📸 Alertes Photos</a></li>
+            <li class="nav-item"><a href="stats.html" style="color:white; text-decoration:none;">📈 Statistiques</a></li>
+        </ul>
+           
+    </nav>
+
+    <main class="main-content">
+        <header>
+            <h1 class="font-black" style="font-size: 2.2rem;">Gestion des Sessions</h1>
+            <p style="color: var(--text-muted);">Sélectionnez une unité d'enseignement ou un examen pour voir les détails</p>
+        </header>
+
+        <div class="status-tabs" style="margin-top: 2.5rem;">
+            <div class="tab active" onclick="filterExams('all', this)">Tous les examens</div>
+            <div class="tab" onclick="filterExams('ongoing', this)">En cours (Live)</div>
+            <div class="tab" onclick="filterExams('finished', this)">Terminés (Archives)</div>
+            <div class="tab" onclick="filterExams('upcoming', this)">À venir</div>
+        </div>
+
+        <div class="exams-grid" id="examsGrid">
+            
+            <div class="exam-card finished" data-status="finished">
+                <div class="exam-meta">Licence 3 • Génie Logiciel</div>
+                <div class="exam-title">Algorithmique Avancée</div>
+                <div class="exam-details">
+                    <div class="info-row"><span>📅</span> Effectué le 12 Juin 2024</div>
+                    <div class="info-row"><span>👥</span> 52 Étudiants inscrits</div>
+                    <div class="info-row"><span>🚫</span> 3 Fraudes détectées</div>
+                </div>
+                <a href="students-list.html" class="btn-action btn-results">Consulter les Notes & PV</a>
+            </div>
+
+            <div class="exam-card ongoing" data-status="ongoing">
+                <div class="exam-meta">Master 1 • Cybersécurité</div>
+                <div class="exam-title">Cryptographie Appliquée</div>
+                <div class="exam-details">
+                    <div class="info-row"><span>⏱️</span> Débuté à 09:00 (Finit à 12:00)</div>
+                    <div class="info-row"><span>👥</span> 24 Étudiants en ligne</div>
+                    <div class="info-row" style="color: var(--danger-color); font-weight: bold;"><span>⚠️</span> 1 Alerte en attente</div>
+                </div>
+                <a href="alerts.html" class="btn-action btn-live">Surveiller le Direct</a>
+            </div>
+
+            <div class="exam-card finished" data-status="finished">
+                <div class="exam-meta">Licence 2 • Réseaux & Télécoms</div>
+                <div class="exam-title">Architecture des Réseaux</div>
+                <div class="exam-details">
+                    <div class="info-row"><span>📅</span> Effectué le 05 Juin 2024</div>
+                    <div class="info-row"><span>👥</span> 80 Étudiants inscrits</div>
+                    <div class="info-row"><span>🚫</span> 0 Fraude détectée</div>
+                </div>
+                <a href="students-list.html" class="btn-action btn-results">Consulter les Notes & PV</a>
+            </div>
+
+            <div class="exam-card upcoming" data-status="upcoming">
+                <div class="exam-meta">Licence 3 • Génie Logiciel</div>
+                <div class="exam-title">Base de Données NoSQL</div>
+                <div class="exam-details">
+                    <div class="info-row"><span>📅</span> Prévu pour le 28 Juin 2024</div>
+                    <div class="info-row"><span>⏳</span> Durée : 02h00</div>
+                </div>
+                <a href="#" class="btn-action" style="background: #f1f5f9; color: #94a3b8; cursor: not-allowed;">Détails indisponibles</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        function filterExams(status, element) {
+            // Mise à jour visuelle des onglets
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            element.classList.add('active');
+
+            const cards = document.querySelectorAll('.exam-card');
+            let hasVisibleCards = false;
+
+            cards.forEach(card => {
+                if(status === 'all' || card.dataset.status === status) {
+                    card.style.display = 'flex';
+                    hasVisibleCards = true;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Gérer l'état vide
+            const grid = document.getElementById('examsGrid');
+            const existingEmpty = document.querySelector('.empty-state');
+            if(existingEmpty) existingEmpty.remove();
+
+            if(!hasVisibleCards) {
+                const emptyMsg = document.createElement('div');
+                emptyMsg.className = 'empty-state';
+                emptyMsg.innerHTML = '<h3>Aucun examen trouvé dans cette catégorie.</h3>';
+                grid.appendChild(emptyMsg);
+            }
+        }
+    </script>
+</body>
+</html>

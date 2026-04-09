@@ -3,161 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Statistiques d'Examen | ProctorEye</title>
+    <title>Statistiques Examen | ProctorEye</title>
     <link rel="stylesheet" href="../../assets/css/main.css">
     <style>
-        body { display: flex; min-height: 100vh; background-color: var(--bg-light); }
-
-        .main-content { flex-grow: 1; padding: 2rem; }
+        body { display: flex; min-height: 100vh; background-color: #f8fafc; }
+        .main-content { flex-grow: 1; padding: 2rem; overflow-y: auto; }
 
         /* Grille des indicateurs clés (KPI) */
-        .kpi-grid {
+        .stats-summary {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2.5rem;
+            margin-top: 1.5rem;
         }
 
-        .kpi-card {
+        .stat-card {
+            background: white;
             padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            border-bottom: 4px solid var(--primary-color);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow);
+            text-align: center;
+            border-top: 4px solid var(--primary-color);
+            transition: transform 0.3s ease;
         }
+        
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-card.danger { border-top-color: var(--danger-color); }
 
-        .kpi-label { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-        .kpi-value { font-size: 2.2rem; margin: 0.5rem 0; }
-        .kpi-trend { font-size: 0.8rem; font-weight: 600; }
-        .trend-up { color: var(--success-color); }
-        .trend-down { color: var(--danger-color); }
+        .stat-value { font-size: 2.5rem; font-weight: 900; color: var(--bg-dark); }
+        .stat-label { color: var(--text-muted); font-size: 0.9rem; font-weight: bold; margin-top: 0.5rem; }
 
-        /* Section Graphiques */
-        .charts-container {
+        /* Conteneurs de graphiques */
+        .details-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr;
+            grid-template-columns: 1fr 1fr;
             gap: 2rem;
         }
 
-        .chart-placeholder {
-            width: 100%;
-            height: 300px;
-            background: linear-gradient(45deg, #f1f5f9 25%, #f8fafc 25%, #f8fafc 50%, #f1f5f9 50%, #f1f5f9 75%, #f8fafc 75%, #f8fafc 100%);
-            background-size: 20px 20px;
+        .chart-container {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow);
+        }
+
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
-            justify-content: center;
-            border-radius: var(--radius-md);
-            border: 1px dashed #cbd5e1;
-            color: var(--secondary-color);
+            gap: 10px;
         }
 
-        /* Liste des questions les plus échouées */
-        .question-ranking {
-            list-style: none;
-            margin-top: 1rem;
+        /* Système de barres horizontales */
+        .bar-group { margin-bottom: 1.5rem; }
+        .bar-info { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; }
+        .bar-rail { background: #f1f5f9; height: 10px; border-radius: 10px; overflow: hidden; }
+        .bar-progress { 
+            height: 100%; 
+            width: 0%; /* Animé par JS */
+            border-radius: 10px; 
+            transition: width 1.5s cubic-bezier(0.1, 0.5, 0.5, 1); 
         }
 
-        .ranking-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.8rem 0;
-            border-bottom: 1px solid var(--bg-light);
-        }
+        /* Couleurs des barres */
+        .color-success { background: #22c55e; }
+        .color-primary { background: #3b82f6; }
+        .color-warning { background: #f59e0b; }
+        .color-danger { background: #ef4444; }
 
-        .progress-bar {
-            height: 8px;
-            background: #e2e8f0;
-            border-radius: 4px;
-            margin-top: 5px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--primary-color);
+        @media (max-width: 1024px) { .details-grid { grid-template-columns: 1fr; } }
+        
+        @media print {
+            .sidebar, .btn-print { display: none !important; }
+            .main-content { padding: 0; }
+            .stat-card { border: 1px solid #ddd; box-shadow: none; }
         }
     </style>
 </head>
 <body>
 
-    <nav class="sidebar" style="width: 250px; background: var(--bg-dark); color: white; padding: 1.5rem;">
+    <nav class="sidebar" style="width: 260px; background: var(--bg-dark); color: white; padding: 1.5rem;">
         <h2 class="font-black">PROCTOR <span class="font-thin">EYE</span></h2>
-        <ul style="list-style: none; margin-top: 2rem; padding: 0;">
-            <li style="margin-bottom: 1rem;"><a href="dashboard.html" style="color: white; text-decoration: none;">📊 Dashboard</a></li>
-            <li style="margin-bottom: 1rem;"><a href="create-exam.html" style="color: white; text-decoration: none;">📝 Créer Examen</a></li>
-            <li style="margin-bottom: 1rem;"><a href="alerts.html" style="color: white; text-decoration: none;">📸 Alertes Photos</a></li>
-            <li style="padding: 10px; background: var(--primary-color); border-radius: 5px;">📈 Statistiques</li>
+        <ul class="nav-menu" style="list-style: none; padding: 0; margin-top: 2rem;">
+            <li class="nav-item" style="margin-bottom: 1rem;"><a href="dashboard.html" style="color:white; text-decoration:none;">📊 Dashboard</a></li>
+            <li class="nav-item" style="margin-bottom: 1rem;"><a href="exams-index.html" style="color:white; text-decoration:none;">📚 Mes Examens</a></li>
+            <li class="nav-item" style="margin-bottom: 1rem;"><a href="create-exam.html" style="color:white; text-decoration:none;">📝 Créer Examen</a></li>
+            <li class="nav-item" style="margin-bottom: 1rem;"><a href="students-list.html" style="color:white; text-decoration:none;">👥 Liste Étudiants</a></li>
+            <li class="nav-item" style="margin-bottom: 1rem;"><a href="alerts.html" style="color:white; text-decoration:none;">📸 Alertes Photos</a></li>
+            <li class="nav-item" style="padding: 10px; background: var(--primary-color); border-radius: 5px; margin-bottom: 1rem;">📈 Statistiques</li>
         </ul>
     </nav>
 
     <main class="main-content">
-        <header style="margin-bottom: 2.5rem;">
-            <h1 class="font-black" style="font-size: 2.2rem;">Analyse de l'Épreuve</h1>
-            <p class="font-normal" style="color: var(--text-muted);">Données consolidées pour l'examen d'Algorithmique Avancée.</p>
+        <header style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 class="font-black" style="font-size: 2rem;">Rapport Statistique</h1>
+                <p class="font-normal" style="color: var(--text-muted);">Examen : Algorithmique Avancée | Promo 2024</p>
+            </div>
+            <button class="btn btn-print" onclick="window.print()" style="background: var(--bg-dark); color: white;">📥 Exporter le bilan</button>
         </header>
 
-        <section class="kpi-grid">
-            <div class="card kpi-card">
-                <span class="kpi-label font-bold">Moyenne Générale</span>
-                <span class="kpi-value font-black">12.45/20</span>
-                <span class="kpi-trend trend-up">↑ 1.2pt vs session préc.</span>
+        <div class="stats-summary">
+            <div class="stat-card">
+                <div class="stat-value">48/52</div>
+                <div class="stat-label">Étudiants Présents</div>
             </div>
-            <div class="card kpi-card" style="border-color: var(--success-color);">
-                <span class="kpi-label font-bold">Taux de Réussite</span>
-                <span class="kpi-value font-black">78%</span>
-                <span class="kpi-trend trend-up">↑ 5% d'étudiants en plus</span>
+            <div class="stat-card">
+                <div class="stat-value">13.8</div>
+                <div class="stat-label">Moyenne de Classe</div>
             </div>
-            <div class="card kpi-card" style="border-color: var(--danger-color);">
-                <span class="kpi-label font-bold">Incidents Fraude</span>
-                <span class="kpi-value font-black">04</span>
-                <span class="kpi-trend trend-down">🚨 Action requise</span>
+            <div class="stat-card danger">
+                <div class="stat-value" style="color: var(--danger-color);">12</div>
+                <div class="stat-label">Alertes IA Confirmées</div>
             </div>
-        </section>
+            <div class="stat-card">
+                <div class="stat-value">01h45</div>
+                <div class="stat-label">Temps Moyen / Copie</div>
+            </div>
+        </div>
 
-        <section class="charts-container">
-            <div class="card">
-                <h3 class="font-bold" style="margin-bottom: 1rem;">Répartition des notes</h3>
-                <div class="chart-placeholder font-normal">
-                    [ Graphique de Distribution (Histogramme) ]
+        <div class="details-grid">
+            <div class="chart-container">
+                <div class="chart-title">📊 Répartition des Notes</div>
+                
+                <div class="bar-group">
+                    <div class="bar-info"><span>[16 - 20] Excellent</span> <strong>12%</strong></div>
+                    <div class="bar-rail"><div class="bar-progress color-success" data-width="12%"></div></div>
+                </div>
+
+                <div class="bar-group">
+                    <div class="bar-info"><span>[12 - 16] Bien</span> <strong>48%</strong></div>
+                    <div class="bar-rail"><div class="bar-progress color-primary" data-width="48%"></div></div>
+                </div>
+
+                <div class="bar-group">
+                    <div class="bar-info"><span>[10 - 12] Passable</span> <strong>25%</strong></div>
+                    <div class="bar-rail"><div class="bar-progress color-warning" data-width="25%"></div></div>
+                </div>
+
+                <div class="bar-group">
+                    <div class="bar-info"><span>[00 - 10] Échec</span> <strong>15%</strong></div>
+                    <div class="bar-rail"><div class="bar-progress color-danger" data-width="15%"></div></div>
                 </div>
             </div>
 
-            <div class="card">
-                <h3 class="font-bold" style="margin-bottom: 1rem;">Points Critiques</h3>
-                <p class="font-normal" style="font-size: 0.85rem; color: var(--text-muted);">Questions ayant le plus faible taux de réussite.</p>
+            <div class="chart-container">
+                <div class="chart-title">🚨 Analyse des Fraudes</div>
                 
-                <ul class="question-ranking">
-                    <li class="ranking-item">
-                        <div style="width: 100%;">
-                            <span class="font-bold">Question n°14 (Complexité)</span>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 25%; background: var(--danger-color);"></div>
-                            </div>
-                        </div>
-                        <span class="font-bold" style="margin-left: 10px;">25%</span>
-                    </li>
-                    <li class="ranking-item">
-                        <div style="width: 100%;">
-                            <span class="font-bold">Question n°3 (Récursivité)</span>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 45%; background: var(--warning-color);"></div>
-                            </div>
-                        </div>
-                        <span class="font-bold" style="margin-left: 10px;">45%</span>
-                    </li>
-                    <li class="ranking-item">
-                        <div style="width: 100%;">
-                            <span class="font-bold">Question n°8 (Graphes)</span>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 60%;"></div>
-                            </div>
-                        </div>
-                        <span class="font-bold" style="margin-left: 10px;">60%</span>
-                    </li>
-                </ul>
+                <div class="bar-group">
+                    <div class="bar-info"><span>Détection Smartphone</span> <strong>60%</strong></div>
+                    <div class="bar-rail"><div class="bar-progress color-danger" data-width="60%"></div></div>
+                </div>
+
+                <div class="bar-group">
+                    <div class="bar-info"><span>Visages Inconnus</span> <strong>25%</strong></div>
+                    <div class="bar-rail"><div class="bar-progress color-warning" data-width="25%"></div></div>
+                </div>
+
+                <div class="bar-group">
+                    <div class="bar-info"><span>Absence de l'étudiant</span> <strong>15%</strong></div>
+                    <div class="bar-rail"><div class="bar-progress color-primary" data-width="15%"></div></div>
+                </div>
+
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem; font-style: italic;">
+                    * Les pourcentages sont basés sur le total des captures suspectes validées par le système.
+                </p>
             </div>
-        </section>
+        </div>
     </main>
 
+    <script>
+        // Animation des barres de statistiques au chargement de la page
+        document.addEventListener('DOMContentLoaded', () => {
+            const bars = document.querySelectorAll('.bar-progress');
+            
+            // On attend un court instant pour laisser le rendu initial se faire
+            setTimeout(() => {
+                bars.forEach(bar => {
+                    const targetWidth = bar.getAttribute('data-width');
+                    bar.style.width = targetWidth;
+                });
+            }, 300);
+        });
+    </script>
 </body>
 </html>

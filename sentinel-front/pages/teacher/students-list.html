@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Étudiants | ProctorEye</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
+    <style>
+        body { display: flex; min-height: 100vh; background-color: #f8fafc; }
+        .main-content { flex-grow: 1; padding: 2rem; }
+
+        /* Barre d'actions */
+        .action-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow);
+        }
+
+        .export-buttons { display: flex; gap: 10px; }
+
+        /* Style du Tableau */
+        .student-table-container {
+            background: white;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background: var(--bg-dark); color: white; padding: 1.2rem; font-size: 0.9rem; }
+        td { padding: 1rem 1.2rem; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
+
+        /* Badges de statut */
+        .badge { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; display: inline-block; }
+        .badge-present { background: #dcfce7; color: #166534; }
+        .badge-absent { background: #f1f5f9; color: #475569; }
+        .badge-fraude { background: #fee2e2; color: #991b1b; border: 1px solid #ef4444; }
+
+        /* Champs de notes */
+        .note-input {
+            width: 65px;
+            padding: 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .note-input:focus { border-color: var(--primary-color); outline: none; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+
+        @media print {
+            .sidebar, .export-buttons, .filter-group, .action-header { display: none !important; }
+            .main-content { padding: 0; width: 100%; }
+            body { background: white; }
+            .student-table-container { box-shadow: none; border: 1px solid #eee; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar" style="width: 260px; background: var(--bg-dark); color: white; padding: 1.5rem;">
+        <h2 class="font-black">PROCTOR <span class="font-thin">EYE</span></h2>
+        <ul class="nav-menu" style="list-style: none; padding: 0; margin-top: 2rem;">
+            <li class="nav-item" style="margin-bottom: 1rem;"><a href="dashboard.html" style="color:white; text-decoration:none;">📊 Dashboard</a></li>
+            <li class="nav-item" style="margin-bottom: 1rem;"><a href="exams-index.html" style="color:white; text-decoration:none;">📚 Mes Examens</a></li>
+            <li class="nav-item" style="margin-bottom: 1rem;"><a href="create-exam.html" style="color:white; text-decoration:none;">📝 Créer Examen</a></li>
+            <li class="nav-item" style="padding: 10px; background: var(--primary-color); border-radius: 5px; margin-bottom: 1rem;">👥 Liste Étudiants</li>
+            <li class="nav-item" style="margin-bottom: 1rem;"><a href="alerts.html" style="color:white; text-decoration:none;">📸 Alertes Photos</a></li>
+            <li class="nav-item"><a href="stats.html" style="color:white; text-decoration:none;">📈 Statistiques</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header>
+            <h1 class="font-black" style="font-size: 2rem;">Suivi & Notation</h1>
+            <p class="font-normal" style="color: var(--text-muted); margin-bottom: 2rem;">Examen : Algorithmique Avancée - Session Juin 2024</p>
+        </header>
+
+        <div class="action-header">
+            <div class="filter-group">
+                <label class="font-bold" style="font-size: 0.8rem; display: block; margin-bottom: 5px;">Filtrer l'affichage :</label>
+                <select id="statusFilter" class="btn font-normal" style="background: #f1f5f9; border: 1px solid #cbd5e1; min-width: 200px; cursor: pointer;">
+                    <option value="all">Tous les étudiants</option>
+                    <option value="present">Présents</option>
+                    <option value="absent">Absents</option>
+                    <option value="fraude">Fraude détectée</option>
+                </select>
+            </div>
+
+            <div class="export-buttons">
+                <button class="btn" onclick="window.print()" style="background: #64748b; color: white;">🖨️ Imprimer</button>
+                <button class="btn" onclick="exportToPDF()" style="background: #ef4444; color: white;">📄 PDF</button>
+                <button class="btn" onclick="exportToWord()" style="background: #2563eb; color: white;">📘 Word</button>
+            </div>
+        </div>
+
+        <div class="student-table-container">
+            <table id="studentTable">
+                <thead>
+                    <tr>
+                        <th class="font-bold">Matricule</th>
+                        <th class="font-bold">Nom Complet</th>
+                        <th class="font-bold">Statut</th>
+                        <th class="font-bold">Détails Incident</th>
+                        <th class="font-bold">Note / 20</th>
+                    </tr>
+                </thead>
+                <tbody id="studentTableBody">
+                    <tr class="student-row" data-status="present">
+                        <td class="font-bold">21U1234</td>
+                        <td>Jean Dupont</td>
+                        <td><span class="badge badge-present">Présent</span></td>
+                        <td>Aucun</td>
+                        <td><input type="number" class="note-input" value="14" min="0" max="20"></td>
+                    </tr>
+                    <tr class="student-row" data-status="fraude">
+                        <td class="font-bold">21U0099</td>
+                        <td>Alice Traoré</td>
+                        <td><span class="badge badge-fraude">FRAUDE</span></td>
+                        <td style="color: #991b1b; font-weight: bold;">Smartphone détecté</td>
+                        <td><input type="number" class="note-input" value="0" min="0" max="20"></td>
+                    </tr>
+                    <tr class="student-row" data-status="absent">
+                        <td class="font-bold">21U0556</td>
+                        <td>Marc Lévy</td>
+                        <td><span class="badge badge-absent">Absent</span></td>
+                        <td>---</td>
+                        <td><input type="number" class="note-input" disabled placeholder="N/A"></td>
+                    </tr>
+                    <tr class="student-row" data-status="present">
+                        <td class="font-bold">21U0888</td>
+                        <td>Koffi Kouamé</td>
+                        <td><span class="badge badge-present">Présent</span></td>
+                        <td>Aucun</td>
+                        <td><input type="number" class="note-input" value="16" min="0" max="20"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        // --- LOGIQUE DE FILTRAGE ---
+        const statusFilter = document.getElementById('statusFilter');
+        const rows = document.querySelectorAll('.student-row');
+
+        statusFilter.addEventListener('change', (e) => {
+            const val = e.target.value;
+            rows.forEach(row => {
+                if (val === 'all' || row.dataset.status === val) {
+                    row.style.display = 'table-row';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // --- EXPORTATION PDF (Utilise jsPDF + AutoTable) ---
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFontSize(18);
+            doc.text("ProctorEye - Relevé de Notes", 14, 15);
+            doc.setFontSize(10);
+            doc.text("Date de génération : " + new Date().toLocaleDateString(), 14, 22);
+
+            doc.autoTable({
+                html: '#studentTable',
+                startY: 30,
+                didParseCell: function(data) {
+                    // Récupération de la valeur de l'input dans la colonne Note
+                    if (data.section === 'body' && data.column.index === 4) {
+                        const input = data.cell.raw.querySelector('input');
+                        if (input) data.cell.text = input.value || "00";
+                    }
+                },
+                styles: { fontSize: 9 },
+                headStyles: { fillColor: [30, 41, 59] } // Couleur var(--bg-dark)
+            });
+
+            doc.save("releve_notes_proctoreye.pdf");
+        }
+
+        // --- EXPORTATION WORD (.doc) ---
+        function exportToWord() {
+            // On prépare une version HTML simplifiée du tableau pour Word
+            let tableHTML = document.getElementById("studentTable").cloneNode(true);
+            
+            // Remplacer les inputs par du texte brut pour le document Word
+            tableHTML.querySelectorAll('input').forEach(input => {
+                let textNode = document.createTextNode(input.value || "N/A");
+                input.parentNode.replaceChild(textNode, input);
+            });
+
+            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export Word</title><style>table{border-collapse:collapse;width:100%;} th,td{border:1px solid black;padding:8px;}</style></head><body>";
+            const footer = "</body></html>";
+            const sourceHTML = header + "<h2>Liste des Notes - ProctorEye</h2>" + tableHTML.outerHTML + footer;
+            
+            const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+            const fileDownload = document.createElement("a");
+            document.body.appendChild(fileDownload);
+            fileDownload.href = source;
+            fileDownload.download = 'releve_notes.doc';
+            fileDownload.click();
+            document.body.removeChild(fileDownload);
+        }
+    </script>
+</body>
+</html>

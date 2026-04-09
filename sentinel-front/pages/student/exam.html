@@ -43,7 +43,7 @@
         }
 
         .timer-display span {
-            font-variant-numeric: tabular-nums; /* Évite que les chiffres bougent */
+            font-variant-numeric: tabular-nums;
         }
 
         /* --- Sidebar (Navigation Questions) --- */
@@ -134,11 +134,7 @@
         <h3 class="font-bold">Navigation</h3>
         <p class="font-normal" style="font-size: 0.8rem; color: var(--text-muted);">24 questions au total</p>
         
-        <div class="question-nav">
-            <button class="q-btn active">1</button>
-            <button class="q-btn done">2</button>
-            <button class="q-btn">3</button>
-            <button class="q-btn">4</button>
+        <div class="question-nav" id="nav-grid">
             </div>
 
         <div class="card" style="margin-top: 2rem; background: #fff5f5; border-color: #feb2b2;">
@@ -149,43 +145,111 @@
 
     <main class="exam-main">
         <div class="card question-card">
-            <span class="question-meta font-bold">Question 1 / 24 (5 Points)</span>
-            <h2 class="font-normal">Expliquez la différence entre un algorithme de tri rapide (QuickSort) et un tri fusion (MergeSort) en termes de complexité spatiale.</h2>
+            <span class="question-meta font-bold" id="question-header">Question 1 / 24 (5 Points)</span>
+            <h2 class="font-normal" id="question-text">Expliquez la différence entre un algorithme de tri rapide (QuickSort) et un tri fusion (MergeSort) en termes de complexité spatiale.</h2>
         </div>
 
         <textarea id="editor-container" placeholder="Saisissez votre réponse détaillée ici..."></textarea>
 
         <div class="exam-footer">
-            <button class="btn" style="background: #e2e8f0;">Précédent</button>
-            <button class="btn btn-primary" onclick="alert('Réponse enregistrée !')">Enregistrer et Suivant</button>
-            <button class="btn" style="background: var(--danger-color); color: white;">Terminer l'épreuve</button>
+            <button class="btn" id="btn-prev" style="background: #e2e8f0;" onclick="changeQuestion(-1)">Précédent</button>
+            <button class="btn btn-primary" onclick="saveAndNext()">Enregistrer et Suivant</button>
+            <button class="btn" style="background: var(--danger-color); color: white;" onclick="confirmFinish()">Terminer l'épreuve</button>
         </div>
     </main>
 
     <script>
-        // Logique du Chrono
+        // --- LOGIQUE DU CHRONO ---
         let time = 5400; // 1h30 en secondes
         const chronoElement = document.getElementById('chrono');
 
-        setInterval(() => {
+        const timer = setInterval(() => {
             let minutes = Math.floor(time / 60);
             let secondes = time % 60;
             chronoElement.innerText = 
                 `${minutes.toString().padStart(2, '0')}:${secondes.toString().padStart(2, '0')}`;
             
             if(time > 0) time--;
+            else {
+                clearInterval(timer);
+                alert("Temps écoulé ! Votre copie a été soumise.");
+                window.location.href = "login.html";
+            }
             
-            // Effet visuel Evolutivité : La graisse augmente quand le temps presse
-            if(time < 300) { // Moins de 5 minutes
+            if(time < 300) { 
                 chronoElement.style.color = "var(--danger-color)";
                 chronoElement.style.fontWeight = "900";
             }
         }, 1000);
 
-        // Détection de triche simple (Perte de focus)
+        // --- LOGIQUE DE NAVIGATION ---
+        let currentQuestion = 1;
+        const totalQuestions = 24;
+
+        function initNav() {
+            const navGrid = document.getElementById('nav-grid');
+            for (let i = 1; i <= totalQuestions; i++) {
+                const btn = document.createElement('button');
+                btn.className = i === 1 ? 'q-btn active' : 'q-btn';
+                btn.id = `nav-q-${i}`;
+                btn.innerText = i;
+                btn.onclick = () => goToQuestion(i);
+                navGrid.appendChild(btn);
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('question-header').innerText = `Question ${currentQuestion} / ${totalQuestions} (5 Points)`;
+            document.getElementById('question-text').innerText = `Énoncé de la question ${currentQuestion} : [Chargement du contenu...]`;
+            
+            // Update boutons nav
+            document.querySelectorAll('.q-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`nav-q-${currentQuestion}`).classList.add('active');
+
+            // Disable/Enable précédent
+            document.getElementById('btn-prev').disabled = (currentQuestion === 1);
+            document.getElementById('btn-prev').style.opacity = (currentQuestion === 1) ? "0.5" : "1";
+        }
+
+        function changeQuestion(direction) {
+            if ((direction === -1 && currentQuestion > 1) || (direction === 1 && currentQuestion < totalQuestions)) {
+                currentQuestion += direction;
+                updateUI();
+            }
+        }
+
+        function goToQuestion(num) {
+            currentQuestion = num;
+            updateUI();
+        }
+
+        function saveAndNext() {
+            // Simulation enregistrement (pas d'alerte ici)
+            document.getElementById(`nav-q-${currentQuestion}`).classList.add('done');
+            console.log(`Question ${currentQuestion} enregistrée.`);
+            
+            if (currentQuestion < totalQuestions) {
+                changeQuestion(1);
+            } else {
+                alert("Vous êtes à la dernière question.");
+            }
+        }
+
+        function confirmFinish() {
+            const check = confirm("⚠️ ATTENTION : Êtes-vous sûr de vouloir terminer l'épreuve ? Vous ne pourrez plus modifier vos réponses.");
+            if (check) {
+                window.location.href = "login.html"; // Redirection vers login ou succès
+            }
+        }
+
+        // Détection de triche
         window.addEventListener('blur', () => {
-            console.warn("ALERTE : Tentative de sortie de la fenêtre !");
+            console.warn("ALERTE : Fenêtre quittée !");
         });
+
+        // Initialisation au chargement
+        initNav();
+        updateUI();
     </script>
 </body>
 </html>

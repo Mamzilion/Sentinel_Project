@@ -9,22 +9,22 @@
         body { 
             display: flex; 
             min-height: 100vh; 
-            background-color: var(--bg-light); 
+            background-color: #f8fafc; 
         }
 
         .main-content { 
             flex-grow: 1; 
             padding: 2rem; 
-            max-width: 1000px; 
-            margin: 0 auto; 
+            max-width: 1100px; 
+            margin-left: 260px; /* Espace pour la sidebar */
         }
 
-        /* Style des sections de formulaire */
+        /* Sections de formulaire */
         .form-section {
             background: white;
-            padding: 2.5rem;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             margin-bottom: 2rem;
             border: 1px solid #e2e8f0;
         }
@@ -33,127 +33,144 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid var(--bg-light);
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #f1f5f9;
             padding-bottom: 1rem;
         }
 
         .section-number {
             background: var(--primary-color);
             color: white;
-            width: 30px;
-            height: 30px;
+            width: 28px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
         }
 
-        /* Grid pour les champs côte à côte */
         .form-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1.5rem;
         }
 
-        .input-group {
-            margin-bottom: 1.5rem;
-        }
-
+        .input-group { margin-bottom: 1.5rem; }
         .input-group label {
             display: block;
-            margin-bottom: 0.6rem;
-            color: var(--text-main);
-            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #475569;
         }
 
         .form-input {
             width: 100%;
-            padding: 0.8rem;
+            padding: 0.75rem;
             border: 1.5px solid #cbd5e1;
-            border-radius: var(--radius-md);
+            border-radius: 8px;
             font-family: inherit;
-            transition: var(--transition);
+            transition: all 0.2s;
         }
 
         .form-input:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
-        /* Style des questions ajoutées */
+        /* Question Blocks */
         .question-block {
-            background: #f1f5f9;
+            background: #f8fafc;
             padding: 1.5rem;
-            border-radius: var(--radius-md);
-            margin-bottom: 1.5rem;
-            border-left: 5px solid var(--secondary-color);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid var(--primary-color);
             position: relative;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-10px); }
-            to { opacity: 1; transform: translateX(0); }
         }
 
         .btn-add {
-            background: transparent;
-            border: 2px dashed var(--secondary-color);
-            color: var(--secondary-color);
+            background: white;
+            border: 2px dashed #cbd5e1;
+            color: #64748b;
             width: 100%;
             padding: 1rem;
-            border-radius: var(--radius-md);
+            border-radius: 8px;
             cursor: pointer;
-            transition: var(--transition);
-            margin-bottom: 2rem;
+            font-weight: bold;
+            transition: 0.2s;
         }
 
         .btn-add:hover {
             border-color: var(--primary-color);
             color: var(--primary-color);
-            background: rgba(37, 99, 235, 0.05);
+            background: #f0f7ff;
         }
 
-        .action-bar {
+        .footer-actions {
             display: flex;
             justify-content: flex-end;
             gap: 1rem;
-            padding: 2rem 0;
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 -4px 6px -1px rgba(0,0,0,0.05);
+            position: sticky;
+            bottom: 20px;
         }
     </style>
 </head>
 <body>
 
+    <nav class="sidebar" style="width: 260px; background: var(--bg-dark); color: white; padding: 1.5rem; position: fixed; height: 100vh;">
+        <h2 class="font-black" style="margin-bottom: 2rem;">PROCTOR <span class="font-thin">EYE</span></h2>
+        <ul class="nav-menu" style="list-style: none; padding: 0;">
+            <li class="nav-item" style="padding: 12px; margin-bottom: 5px;"><a href="dashboard.html" style="color:#94a3b8; text-decoration:none;">📊 Dashboard</a></li>
+            <li class="nav-item" style="padding: 12px; margin-bottom: 5px;"><a href="exams-index.html" style="color:#94a3b8; text-decoration:none;">📚 Mes Examens</a></li>
+            <li class="nav-item" style="padding: 12px; background: var(--primary-color); border-radius: 8px;"><a href="create-exam.html" style="color:white; text-decoration:none; font-weight:bold;">📝 Créer Examen</a></li>
+            <li class="nav-item " style="padding: 12px; margin-bottom: 5px;"><a href="students-list.html" style="color:inherit; text-decoration:none;">👥 Liste Étudiants</a></li>
+            <li class="nav-item" style="padding: 12px; margin-bottom: 5px;"></li><a href="alerts.html" style="color:inherit; text-decoration:none;">📸 Alertes Photos</a></li>
+            <li class="nav-item" style="padding: 12px; margin-bottom: 5px;"></li><a href="stats.html" style="color:inherit; text-decoration:none;">📈 Statistiques</a></li>
+        </ul>
+    </nav>
+
     <main class="main-content">
-        <header style="margin-bottom: 3rem;">
-            <a href="dashboard.html" class="font-bold" style="text-decoration: none; color: var(--primary-color);">← Retour au Dashboard</a>
-            <h1 class="font-black" style="font-size: 2.5rem; margin-top: 1rem;">Configuration de l'épreuve</h1>
-            <p class="font-normal" style="color: var(--text-muted);">Définissez les paramètres, le sujet et le barème de votre examen.</p>
+        <header style="margin-bottom: 2rem;">
+            <h1 class="font-black" style="font-size: 2rem;">Nouvelle Épreuve</h1>
+            <p style="color: #64748b;">Configurez les détails et le sujet de votre examen sécurisé.</p>
         </header>
 
         <form id="createExamForm">
             <section class="form-section">
                 <div class="section-header">
                     <span class="section-number font-bold">1</span>
-                    <h2 class="font-bold">Informations Générales</h2>
+                    <h2 class="font-bold">Ciblage & Identité</h2>
                 </div>
-                
                 <div class="input-group">
-                    <label class="font-bold">Intitulé de l'examen</label>
-                    <input type="text" class="form-input" placeholder="Ex: Mathématiques Financières - Session 1" required>
+                    <label>Nom de l'Unité d'Enseignement (UE)</label>
+                    <input type="text" class="form-input" placeholder="Ex: Algorithmique et Structure de Données" required>
                 </div>
-
                 <div class="form-grid">
                     <div class="input-group">
-                        <label class="font-bold">Durée (en minutes)</label>
-                        <input type="number" class="form-input" placeholder="120" required>
+                        <label>Niveau</label>
+                        <select class="form-input">
+                            <option>Licence 1</option>
+                            <option>Licence 2</option>
+                            <option>Licence 3</option>
+                            <option>Master 1</option>
+                            <option>Master 2</option>
+                        </select>
                     </div>
                     <div class="input-group">
-                        <label class="font-bold">Date prévue</label>
-                        <input type="date" class="form-input" required>
+                        <label>Spécialité</label>
+                        <select class="form-input">
+                            <option>Génie Logiciel</option>
+                            <option>Cybersécurité</option>
+                            <option>Réseaux & Télécoms</option>
+                            <option>Intelligence Artificielle</option>
+                        </select>
                     </div>
                 </div>
             </section>
@@ -161,40 +178,57 @@
             <section class="form-section">
                 <div class="section-header">
                     <span class="section-number font-bold">2</span>
-                    <h2 class="font-bold">Contenu du sujet</h2>
+                    <h2 class="font-bold">Paramètres de session</h2>
                 </div>
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>Date de l'examen</label>
+                        <input type="date" class="form-input" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Heure de début</label>
+                        <input type="time" class="form-input" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Durée (min)</label>
+                        <input type="number" class="form-input" value="120">
+                    </div>
+                </div>
+            </section>
 
+            <section class="form-section">
+                <div class="section-header">
+                    <span class="section-number font-bold">3</span>
+                    <h2 class="font-bold">Sujet de l'examen</h2>
+                </div>
                 <div id="questionsContainer">
                     <div class="question-block">
                         <div class="input-group">
-                            <label class="font-bold">Énoncé de la question #1</label>
-                            <textarea class="form-input" rows="3" placeholder="Saisissez l'énoncé ici..."></textarea>
+                            <label>Question #1</label>
+                            <textarea class="form-input" rows="2" placeholder="Saisissez votre question..."></textarea>
                         </div>
                         <div class="form-grid">
                             <div class="input-group">
-                                <label class="font-bold">Type de réponse attendu</label>
-                                <select class="form-input">
-                                    <option>Saisie de texte / Code</option>
-                                    <option>Choix multiples (QCM)</option>
-                                    <option>Dépôt de fichier PDF/ZIP</option>
-                                </select>
+                                <label>Barème (Points)</label>
+                                <input type="number" class="form-input" value="5">
                             </div>
                             <div class="input-group">
-                                <label class="font-bold">Points attribués</label>
-                                <input type="number" class="form-input" placeholder="5">
+                                <label>Type de réponse</label>
+                                <select class="form-input">
+                                    <option>Zone de texte libre</option>
+                                    <option>QCM</option>
+                                    <option>Dépôt de fichier</option>
+                                </select>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <button type="button" id="addQuestionBtn" class="btn-add font-bold">
-                    + Ajouter une nouvelle question
-                </button>
+                <button type="button" id="addQuestionBtn" class="btn-add">+ Ajouter une question</button>
             </section>
 
-            <div class="action-bar">
-                <button type="button" class="btn" style="background: #e2e8f0;">Enregistrer comme brouillon</button>
-                <button type="submit" class="btn btn-primary font-black" style="padding: 1rem 2.5rem;">LANCER L'EXAMEN</button>
+            <div class="footer-actions">
+                <button type="button" class="btn" style="background: #e2e8f0; border:none;">Sauvegarder Brouillon</button>
+                <button type="submit" class="btn" style="background: var(--primary-color); color:white; border:none; padding: 0 2rem;">PUBLIER L'EXAMEN</button>
             </div>
         </form>
     </main>
@@ -210,31 +244,31 @@
             div.className = 'question-block';
             div.innerHTML = `
                 <div class="input-group">
-                    <label class="font-bold">Énoncé de la question #${questionCount}</label>
-                    <textarea class="form-input" rows="3" placeholder="Saisissez l'énoncé ici..."></textarea>
+                    <label>Question #${questionCount}</label>
+                    <textarea class="form-input" rows="2" placeholder="Saisissez votre question..."></textarea>
                 </div>
                 <div class="form-grid">
                     <div class="input-group">
-                        <label class="font-bold">Type de réponse attendu</label>
-                        <select class="form-input">
-                            <option>Saisie de texte / Code</option>
-                            <option>Choix multiples (QCM)</option>
-                            <option>Dépôt de fichier PDF/ZIP</option>
-                        </select>
+                        <label>Barème (Points)</label>
+                        <input type="number" class="form-input" value="5">
                     </div>
                     <div class="input-group">
-                        <label class="font-bold">Points attribués</label>
-                        <input type="number" class="form-input" placeholder="5">
+                        <label>Type de réponse</label>
+                        <select class="form-input">
+                            <option>Zone de texte libre</option>
+                            <option>QCM</option>
+                            <option>Dépôt de fichier</option>
+                        </select>
                     </div>
                 </div>
-                <button type="button" onclick="this.parentElement.remove()" style="color: var(--danger-color); background:none; border:none; cursor:pointer; font-size: 0.8rem; margin-top: 10px;">Supprimer cette question</button>
+                <button type="button" onclick="this.parentElement.remove()" style="color:#ef4444; background:none; border:none; cursor:pointer; font-size:0.75rem;">Supprimer</button>
             `;
             container.appendChild(div);
         });
 
         document.getElementById('createExamForm').onsubmit = (e) => {
             e.preventDefault();
-            alert("L'examen a été créé et les questions ont été envoyées à l'API !");
+            alert("Examen publié avec succès ! Vos étudiants recevront une notification.");
         };
     </script>
 </body>
