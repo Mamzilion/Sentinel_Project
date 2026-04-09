@@ -1,0 +1,6 @@
+psutil
+websockets
+opencv-python
+cryptography
+requests
+pywin32
