@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion Étudiant | Mode Sécurisé</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <style>
+        body {
+            background-color: var(--bg-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden; /* Empêche le défilement en mode kiosque */
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .login-card {
+            padding: 3rem;
+            text-align: center;
+            border-top: 5px solid var(--primary-color);
+        }
+
+        .kiosk-badge {
+            background: #e2e8f0;
+            color: var(--secondary-color);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #cbd5e1;
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn-login {
+            width: 100%;
+            justify-content: center;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-size: 1rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Message de sécurité en bas */
+        .security-note {
+            margin-top: 1.5rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <div class="card login-card">
+            <span class="kiosk-badge font-bold">🔒 Mode Kiosque Activé</span>
+            
+            <h2 class="font-black" style="font-size: 1.8rem; margin-bottom: 0.5rem;">Authentification</h2>
+            <p class="font-normal" style="color: var(--text-muted); margin-bottom: 2rem;">Espace Épreuve Numérique</p>
+
+            <form id="studentLoginForm">
+                <div class="form-group">
+                    <label for="matricule" class="font-bold">Matricule Étudiant</label>
+                    <input type="text" id="matricule" class="form-control" placeholder="Ex: 21U1234" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="font-bold">Mot de passe</label>
+                    <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-login font-bold">
+                    Démarrer l'épreuve
+                </button>
+            </form>
+
+            <p class="security-note font-normal">
+                Votre adresse MAC sera automatiquement associée à cette session pour garantir l'intégrité de l'examen.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('studentLoginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Simulation de redirection vers l'examen
+            window.location.href = 'exam.html';
+        });
+    </script>
+</body>
+</html>

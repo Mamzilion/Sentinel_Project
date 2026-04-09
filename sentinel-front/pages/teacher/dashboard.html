@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Enseignant | Surveillance Live</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <style>
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f8fafc;
+        }
+
+        /* --- Sidebar Enseignant --- */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-dark);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .sidebar h2 {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 1rem;
+        }
+
+        .nav-menu {
+            list-style: none;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--primary-color);
+        }
+
+        /* --- Main Content --- */
+        .main-content {
+            flex-grow: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        /* Grille de Monitoring Live */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            display: block;
+        }
+
+        /* Monitoring des Étudiants */
+        .student-monitoring-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .student-live-card {
+            position: relative;
+            border-left: 5px solid var(--success-color);
+        }
+
+        .student-live-card.alert {
+            border-left-color: var(--danger-color);
+            animation: pulse-border 2s infinite;
+        }
+
+        @keyframes pulse-border {
+            0% { box-shadow: 0 0 0 0px rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0px rgba(239, 68, 68, 0); }
+        }
+
+        .live-photo {
+            width: 100%;
+            height: 150px;
+            background: #e2e8f0;
+            border-radius: var(--radius-md);
+            margin-top: 1rem;
+            object-fit: cover;
+        }
+
+        .badge-live {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: var(--success-color);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <h2 class="font-black">PROCTOR <span class="font-thin">EYE</span></h2>
+        <ul class="nav-menu">
+            <li class="nav-item active font-bold">📊 Dashboard</li>
+            <li class="nav-item font-normal">📝 Créer Examen</li>
+            <li class="nav-item font-normal">📸 Alertes Photos</li>
+            <li class="nav-item font-normal">📈 Statistiques</li>
+        </ul>
+        <div class="user-info font-normal" style="font-size: 0.8rem; opacity: 0.7;">
+            Connecté: Pr. Kouamé
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <header style="margin-bottom: 2rem;">
+            <h1 class="font-black" style="font-size: 2rem;">Surveillance en temps réel</h1>
+            <p class="font-normal" style="color: var(--text-muted);">Examen: Algorithmique Avancée - Amphi 200</p>
+        </header>
+
+        <section class="stats-grid">
+            <div class="card stat-card">
+                <span class="font-normal">Connectés</span>
+                <span class="stat-value font-black" style="color: var(--primary-color);">42/45</span>
+            </div>
+            <div class="card stat-card">
+                <span class="font-normal">Terminés</span>
+                <span class="stat-value font-black" style="color: var(--success-color);">12</span>
+            </div>
+            <div class="card stat-card">
+                <span class="font-normal">Alertes</span>
+                <span class="stat-value font-black" style="color: var(--danger-color);">03</span>
+            </div>
+        </section>
+
+        <h2 class="font-bold" style="margin-bottom: 1.5rem;">Étudiants Actifs</h2>
+
+        <section class="student-monitoring-grid">
+            
+            <div class="card student-live-card">
+                <span class="badge-live">LIVE</span>
+                <p class="font-bold">21U1234 - Jean Dupont</p>
+                <p class="font-normal" style="font-size: 0.8rem; color: var(--text-muted);">Dernière activité: 10s</p>
+                <div class="live-photo" style="display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #94a3b8;">
+                    Flux caméra actif...
+                </div>
+            </div>
+
+            <div class="card student-live-card alert">
+                <span class="badge-live" style="background: var(--danger-color);">ALERTE</span>
+                <p class="font-bold">21U0099 - Alice Traoré</p>
+                <p class="font-normal" style="font-size: 0.8rem; color: var(--danger-color);">DÉTECTION: Objet non autorisé</p>
+                <img src="https://via.placeholder.com/300x150/ffeded/ef4444?text=Capture+Alerte+Triche" alt="Alerte" class="live-photo">
+                <button class="btn btn-primary" style="width: 100%; margin-top: 10px; padding: 0.5rem; font-size: 0.8rem;">Intervenir</button>
+            </div>
+
+            <div class="card student-live-card">
+                <span class="badge-live">LIVE</span>
+                <p class="font-bold">21U0556 - Marc Lévy</p>
+                <p class="font-normal" style="font-size: 0.8rem; color: var(--text-muted);">Dernière activité: 2m</p>
+                <div class="live-photo" style="display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #94a3b8;">
+                    Flux caméra actif...
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+</body>
+</html>

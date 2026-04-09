@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portail d'Examen Intégré | Accueil</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+    <style>
+        /* Styles spécifiques à la page d'accueil pour le design de la grille */
+        .portal-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .welcome-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .welcome-header h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .role-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .role-card {
+            text-align: center;
+            padding: 3rem 2rem;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 2px solid transparent;
+        }
+
+        .role-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-10px);
+        }
+
+        .role-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .role-name {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .role-description {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="portal-wrapper">
+        <header class="welcome-header">
+            <h1 class="font-thin">SYSTÈME D'<span class="font-black">EXAMEN</span></h1>
+            <p class="font-normal">Veuillez sélectionner votre espace de travail pour continuer.</p>
+        </header>
+
+        <main class="role-grid">
+            <a href="pages/student/login.html" class="card role-card">
+                <div class="role-icon">🎓</div>
+                <h2 class="role-name font-bold">Espace Étudiant</h2>
+                <p class="role-description">Accédez à vos épreuves en mode sécurisé (Kiosque) et soumettez vos travaux.</p>
+            </a>
+
+            <a href="pages/teacher/dashboard.html" class="card role-card">
+                <div class="role-icon">👨‍🏫</div>
+                <h2 class="role-name font-bold">Espace Enseignant</h2>
+                <p class="role-description">Gérez les sujets, surveillez le déroulement en temps réel et consultez les alertes.</p>
+            </a>
+
+            <a href="pages/admin/manage-users.html" class="card role-card">
+                <div class="role-icon">🛡️</div>
+                <h2 class="role-name font-bold">Administration</h2>
+                <p class="role-description">Gestion du parc informatique, des adresses MAC et journal de sécurité global.</p>
+            </a>
+        </main>
+
+        <footer style="margin-top: 4rem; color: var(--text-muted); font-size: 0.8rem;">
+            <p class="font-normal">&copy; 2024 Projet d'Intégration - Évolutivité des Technologies Web</p>
+        </footer>
+    </div>
+
+</body>
+</html>

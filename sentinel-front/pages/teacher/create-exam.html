@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Créer un Examen | ProctorEye</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <style>
+        body { 
+            display: flex; 
+            min-height: 100vh; 
+            background-color: var(--bg-light); 
+        }
+
+        .main-content { 
+            flex-grow: 1; 
+            padding: 2rem; 
+            max-width: 1000px; 
+            margin: 0 auto; 
+        }
+
+        /* Style des sections de formulaire */
+        .form-section {
+            background: white;
+            padding: 2.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--bg-light);
+            padding-bottom: 1rem;
+        }
+
+        .section-number {
+            background: var(--primary-color);
+            color: white;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 0.9rem;
+        }
+
+        /* Grid pour les champs côte à côte */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.6rem;
+            color: var(--text-main);
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1.5px solid #cbd5e1;
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Style des questions ajoutées */
+        .question-block {
+            background: #f1f5f9;
+            padding: 1.5rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 1.5rem;
+            border-left: 5px solid var(--secondary-color);
+            position: relative;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .btn-add {
+            background: transparent;
+            border: 2px dashed var(--secondary-color);
+            color: var(--secondary-color);
+            width: 100%;
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 2rem;
+        }
+
+        .btn-add:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            padding: 2rem 0;
+        }
+    </style>
+</head>
+<body>
+
+    <main class="main-content">
+        <header style="margin-bottom: 3rem;">
+            <a href="dashboard.html" class="font-bold" style="text-decoration: none; color: var(--primary-color);">← Retour au Dashboard</a>
+            <h1 class="font-black" style="font-size: 2.5rem; margin-top: 1rem;">Configuration de l'épreuve</h1>
+            <p class="font-normal" style="color: var(--text-muted);">Définissez les paramètres, le sujet et le barème de votre examen.</p>
+        </header>
+
+        <form id="createExamForm">
+            <section class="form-section">
+                <div class="section-header">
+                    <span class="section-number font-bold">1</span>
+                    <h2 class="font-bold">Informations Générales</h2>
+                </div>
+                
+                <div class="input-group">
+                    <label class="font-bold">Intitulé de l'examen</label>
+                    <input type="text" class="form-input" placeholder="Ex: Mathématiques Financières - Session 1" required>
+                </div>
+
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label class="font-bold">Durée (en minutes)</label>
+                        <input type="number" class="form-input" placeholder="120" required>
+                    </div>
+                    <div class="input-group">
+                        <label class="font-bold">Date prévue</label>
+                        <input type="date" class="form-input" required>
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-section">
+                <div class="section-header">
+                    <span class="section-number font-bold">2</span>
+                    <h2 class="font-bold">Contenu du sujet</h2>
+                </div>
+
+                <div id="questionsContainer">
+                    <div class="question-block">
+                        <div class="input-group">
+                            <label class="font-bold">Énoncé de la question #1</label>
+                            <textarea class="form-input" rows="3" placeholder="Saisissez l'énoncé ici..."></textarea>
+                        </div>
+                        <div class="form-grid">
+                            <div class="input-group">
+                                <label class="font-bold">Type de réponse attendu</label>
+                                <select class="form-input">
+                                    <option>Saisie de texte / Code</option>
+                                    <option>Choix multiples (QCM)</option>
+                                    <option>Dépôt de fichier PDF/ZIP</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label class="font-bold">Points attribués</label>
+                                <input type="number" class="form-input" placeholder="5">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" id="addQuestionBtn" class="btn-add font-bold">
+                    + Ajouter une nouvelle question
+                </button>
+            </section>
+
+            <div class="action-bar">
+                <button type="button" class="btn" style="background: #e2e8f0;">Enregistrer comme brouillon</button>
+                <button type="submit" class="btn btn-primary font-black" style="padding: 1rem 2.5rem;">LANCER L'EXAMEN</button>
+            </div>
+        </form>
+    </main>
+
+    <script>
+        const container = document.getElementById('questionsContainer');
+        const addBtn = document.getElementById('addQuestionBtn');
+        let questionCount = 1;
+
+        addBtn.addEventListener('click', () => {
+            questionCount++;
+            const div = document.createElement('div');
+            div.className = 'question-block';
+            div.innerHTML = `
+                <div class="input-group">
+                    <label class="font-bold">Énoncé de la question #${questionCount}</label>
+                    <textarea class="form-input" rows="3" placeholder="Saisissez l'énoncé ici..."></textarea>
+                </div>
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label class="font-bold">Type de réponse attendu</label>
+                        <select class="form-input">
+                            <option>Saisie de texte / Code</option>
+                            <option>Choix multiples (QCM)</option>
+                            <option>Dépôt de fichier PDF/ZIP</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label class="font-bold">Points attribués</label>
+                        <input type="number" class="form-input" placeholder="5">
+                    </div>
+                </div>
+                <button type="button" onclick="this.parentElement.remove()" style="color: var(--danger-color); background:none; border:none; cursor:pointer; font-size: 0.8rem; margin-top: 10px;">Supprimer cette question</button>
+            `;
+            container.appendChild(div);
+        });
+
+        document.getElementById('createExamForm').onsubmit = (e) => {
+            e.preventDefault();
+            alert("L'examen a été créé et les questions ont été envoyées à l'API !");
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+/* Importation d'une police variable moderne (Inter ou Roboto Flex) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:slnt,wght@-10..0,100..900&display=swap');
+
+:root {
+    /* Palette de couleurs moderne et accessible */
+    --primary-color: #2563eb;      /* Bleu Tech */
+    --secondary-color: #64748b;    /* Gris ardoise */
+    --success-color: #10b981;      /* Vert émeraude (Statut OK) */
+    --danger-color: #ef4444;       /* Rouge (Alertes) */
+    --warning-color: #f59e0b;      /* Orange (Chrono bas) */
+    
+    /* Couleurs de fond */
+    --bg-light: #f8fafc;
+    --bg-dark: #0f172a;
+    --card-bg: #ffffff;
+
+    /* Couleurs de texte */
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+
+    /* Système de Grillage et Espacement */
+    --radius-md: 8px;
+    --radius-lg: 16px;
+    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    
+    /* Transition fluide pour l'interactivité */
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Reset de base pour une cohérence multi-navigateur */
+*, ::before, ::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-main);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* --- Utilisation de la Font-Weight Variable --- */
+
+/* Titre ultra-léger mais moderne */
+.font-thin {
+    font-weight: 100;
+}
+
+/* Titre standard */
+.font-normal {
+    font-weight: 400;
+}
+
+/* Mise en emphase dynamique */
+.font-bold {
+    font-weight: 700;
+}
+
+/* Titre impactant pour les alertes ou le chrono */
+.font-black {
+    font-weight: 900;
+    letter-spacing: -0.02em;
+}
+
+/* --- Classes Utilitaires Globales --- */
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 0;
+}
+
+.card {
+    background: var(--card-bg);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    border: 1px solid #e2e8f0;
+    transition: var(--transition);
+}
+
+.card:hover {
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+
+/* Boutons modernes */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: var(--transition);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+/* Status Badges */
+.status-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.status-online { background-color: var(--success-color); box-shadow: 0 0 8px var(--success-color); }
+.status-offline { background-color: var(--danger-color); }
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+    body {
+        font-size: 14px;
+    }
+}

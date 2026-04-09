@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLATINE - Connexion Étudiant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-100 font-sans">
+
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl p-10">
+            
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-blue-900 rounded-2xl mx-auto mb-4 flex items-center justify-center text-white font-black text-2xl">
+                    P
+                </div>
+                <h1 class="text-3xl font-extrabold text-slate-800">PLATINE</h1>
+                <p class="text-slate-500 text-sm mt-1">IUT de Ngaoundéré - Session d'Examen</p>
+            </div>
+
+            <form id="loginForm" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Matricule</label>
+                    <input type="text" id="matricule" placeholder="Ex: 22I001" required
+                        class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Mot de passe</label>
+                    <input type="password" id="password" placeholder="••••••••" required
+                        class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all">
+                </div>
+
+                <button type="submit" 
+                    class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-xl shadow-lg transition-all active:scale-95">
+                    Démarrer l'examen
+                </button>
+            </form>
+
+            <div class="mt-8 pt-6 border-t border-slate-100 flex items-center justify-center space-x-2 text-[10px] uppercase tracking-widest font-bold text-green-600">
+                <span class="h-2 w-2 bg-green-500 rounded-full animate-ping"></span>
+                <span>Agent Sentinel Actif</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

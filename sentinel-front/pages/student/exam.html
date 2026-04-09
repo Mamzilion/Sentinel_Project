@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen en cours | Session Sécurisée</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <style>
+        :root {
+            --sidebar-width: 300px;
+            --header-height: 70px;
+        }
+
+        body {
+            background-color: #f1f5f9;
+            height: 100vh;
+            display: grid;
+            grid-template-areas: 
+                "header header"
+                "sidebar main";
+            grid-template-columns: var(--sidebar-width) 1fr;
+            grid-template-rows: var(--header-height) 1fr;
+            overflow: hidden;
+        }
+
+        /* --- Header & Chrono --- */
+        .exam-header {
+            grid-area: header;
+            background: var(--bg-dark);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            z-index: 10;
+        }
+
+        .timer-display {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1.5rem;
+            border-radius: var(--radius-md);
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .timer-display span {
+            font-variant-numeric: tabular-nums; /* Évite que les chiffres bougent */
+        }
+
+        /* --- Sidebar (Navigation Questions) --- */
+        .exam-sidebar {
+            grid-area: sidebar;
+            background: white;
+            border-right: 1px solid #e2e8f0;
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .question-nav {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .q-btn {
+            aspect-ratio: 1;
+            border: 1px solid #cbd5e1;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .q-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .q-btn.done { background: var(--success-color); color: white; border-color: var(--success-color); }
+
+        /* --- Zone de Travail Principale --- */
+        .exam-main {
+            grid-area: main;
+            padding: 2rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .question-card {
+            padding: 2rem;
+        }
+
+        .question-meta {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        #editor-container {
+            flex-grow: 1;
+            min-height: 300px;
+            background: white;
+            border-radius: var(--radius-md);
+            border: 1px solid #cbd5e1;
+            padding: 1rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.1rem;
+            resize: none;
+            outline: none;
+        }
+
+        .exam-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="exam-header">
+        <div class="exam-info">
+            <span class="font-thin">Examen:</span> <span class="font-bold">Algorithmique Avancée</span>
+        </div>
+        <div class="timer-display">
+            Temps restant: <span id="chrono" class="font-black">01:29:59</span>
+        </div>
+        <div class="user-pill">
+            <span class="status-indicator status-online"></span>
+            <span class="font-normal">Matricule: 21U1234</span>
+        </div>
+    </header>
+
+    <aside class="exam-sidebar">
+        <h3 class="font-bold">Navigation</h3>
+        <p class="font-normal" style="font-size: 0.8rem; color: var(--text-muted);">24 questions au total</p>
+        
+        <div class="question-nav">
+            <button class="q-btn active">1</button>
+            <button class="q-btn done">2</button>
+            <button class="q-btn">3</button>
+            <button class="q-btn">4</button>
+            </div>
+
+        <div class="card" style="margin-top: 2rem; background: #fff5f5; border-color: #feb2b2;">
+            <p class="font-bold" style="color: var(--danger-color); font-size: 0.8rem;">⚠️ Rappel Sécurité</p>
+            <p style="font-size: 0.7rem;">Toute sortie du plein écran ou détection de visage multiple générera une alerte immédiate.</p>
+        </div>
+    </aside>
+
+    <main class="exam-main">
+        <div class="card question-card">
+            <span class="question-meta font-bold">Question 1 / 24 (5 Points)</span>
+            <h2 class="font-normal">Expliquez la différence entre un algorithme de tri rapide (QuickSort) et un tri fusion (MergeSort) en termes de complexité spatiale.</h2>
+        </div>
+
+        <textarea id="editor-container" placeholder="Saisissez votre réponse détaillée ici..."></textarea>
+
+        <div class="exam-footer">
+            <button class="btn" style="background: #e2e8f0;">Précédent</button>
+            <button class="btn btn-primary" onclick="alert('Réponse enregistrée !')">Enregistrer et Suivant</button>
+            <button class="btn" style="background: var(--danger-color); color: white;">Terminer l'épreuve</button>
+        </div>
+    </main>
+
+    <script>
+        // Logique du Chrono
+        let time = 5400; // 1h30 en secondes
+        const chronoElement = document.getElementById('chrono');
+
+        setInterval(() => {
+            let minutes = Math.floor(time / 60);
+            let secondes = time % 60;
+            chronoElement.innerText = 
+                `${minutes.toString().padStart(2, '0')}:${secondes.toString().padStart(2, '0')}`;
+            
+            if(time > 0) time--;
+            
+            // Effet visuel Evolutivité : La graisse augmente quand le temps presse
+            if(time < 300) { // Moins de 5 minutes
+                chronoElement.style.color = "var(--danger-color)";
+                chronoElement.style.fontWeight = "900";
+            }
+        }, 1000);
+
+        // Détection de triche simple (Perte de focus)
+        window.addEventListener('blur', () => {
+            console.warn("ALERTE : Tentative de sortie de la fenêtre !");
+        });
+    </script>
+</body>
+</html>
