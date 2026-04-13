@@ -1,66 +1,45 @@
+/**
+ * SENTINEL - Backend Server v2.1
+ * Centralise l'authentification et la gestion des examens.
+ */
+
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const helmet = require('helmet');
-const path = require('path');
-
-// --- IMPORT DES MODULES & ROUTES ---
-const upload = require('./middleware/upload');
-const Alert = require('./models/Alert');
-const authController = require('./controllers/authController');
-const examRoutes = require('./routes/examRoutes'); // Route pour les sujets
+const path = require('path'); // Ajouté pour gérer les chemins proprement
 
 const app = express();
 
 // --- MIDDLEWARES ---
-app.use(express.json());
-app.use(cors());
-app.use(helmet());
+app.use(cors()); // Autorise le Dashboard Web et l'Agent Python
+app.use(express.json({ limit: '10mb' })); // Augmenté pour supporter les JSON lourds si besoin
 
-// Accès public aux fichiers (Photos d'alertes / Copies)
-app.use('/storage', express.static(path.join(__dirname, 'storage')));
+// --- ACCÈS AUX FICHIERS (STATIC) ---
+// Cette ligne rend le dossier "uploads" accessible publiquement via l'URL /uploads
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // --- CONNEXION MONGODB ---
-mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/sentinel_db')
-    .then(() => console.log('✅ MongoDB Connecté (Sentinel)'))
-    .catch(err => console.log('❌ Erreur de connexion MongoDB:', err));
+const mongoURI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/sentinel_db';
+
+mongoose.connect(mongoURI)
+    .then(() => console.log("🌐 MongoDB Connecté : sentinel_db"))
+    .catch(err => console.error("❌ Erreur Mongo:", err));
 
 // --- ROUTES ---
+// Authentification & Verrouillage MAC
+app.use('/api/auth', require('./routes/authRoutes'));
 
-// 1. Authentification (Login + Vérification MAC via le contrôleur)
-app.post('/api/auth/login', authController.login);
+// Gestion des examens (Sujets et Copies)
+app.use('/api/examen', require('./routes/examenRoutes'));
 
-// 2. Gestion des Examens (Récupération des sujets par l'Agent)
-app.use('/api/exams', examRoutes);
-
-// 3. Réception des Alertes (Capture Webcam + Logs de triche)
-app.post('/api/alerts/upload', upload.single('photo'), async (req, res) => {
-    try {
-        const { matricule, type_incident } = req.body;
-        
-        const newAlert = new Alert({
-            matricule,
-            type_incident: type_incident,
-            photo_url: req.file ? req.file.path : null
-        });
-
-        await newAlert.save();
-        
-        console.log(`⚠️ ALERTE : [${type_incident}] enregistrée pour l'étudiant ${matricule}`);
-        res.status(201).json({ 
-            message: "Alerte et preuve visuelle sauvegardées avec succès",
-            alertId: newAlert._id 
-        });
-    } catch (err) {
-        console.error("❌ Erreur lors de l'enregistrement de l'alerte:", err);
-        res.status(500).json({ error: err.message });
-    }
+// --- GESTION DES ERREURS ---
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ message: "Erreur interne Sentinel." });
 });
 
-// --- LANCEMENT DU SERVEUR ---
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`🚀 Serveur Sentinel démarré sur le port ${PORT}`);
-    console.log(`📂 Dossier de stockage : ${path.join(__dirname, 'storage')}`);
+    console.log(`🚀 SENTINEL v2.1 sur le port ${PORT}`);
 });

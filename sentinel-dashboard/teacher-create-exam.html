@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Sentinel | Gestion des Sujets</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #2c3e50; --accent: #3498db; --success: #27ae60; --warning: #f39c12; --danger: #e74c3c; --bg: #f5f6fa; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
+        .container { max-width: 950px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .exam-header { border-bottom: 2px solid #eee; margin-bottom: 30px; padding-bottom: 20px; }
+        .question-card { 
+            background: #fff; border: 1px solid #ddd; padding: 20px; 
+            margin-bottom: 20px; border-radius: 8px; position: relative;
+            border-left: 5px solid var(--accent);
+        }
+        .type-badge { position: absolute; top: 10px; right: 10px; padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; background: #eee; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-add { background: var(--accent); color: white; margin-bottom: 20px; }
+        .btn-save { background: var(--success); color: white; width: 100%; font-size: 1.1rem; justify-content: center; }
+        .btn-edit { background: var(--warning); color: white; font-size: 0.85rem; }
+        .btn-toggle { background: #95a5a6; color: white; font-size: 0.85rem; }
+        .btn-active { background: var(--success); }
+        .status-badge { padding: 4px 10px; border-radius: 15px; font-size: 0.75rem; font-weight: bold; color: white; }
+        .bg-active { background: var(--success); }
+        .bg-inactive { background: #7f8c8d; }
+        .exam-item { padding: 15px; background: #fff; border: 1px solid #ddd; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .exam-info { flex-grow: 1; }
+        .exam-actions { display: flex; gap: 8px; }
+    </style>
+</head>
+<body>
+
+<div class="container" style="border-left: 5px solid var(--success);">
+    <h2><i class="fas fa-list"></i> Mes Sujets Enregistrés</h2>
+    <div id="existing-exams-list">
+        <p>Chargement des sujets...</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="exam-header">
+        <h1 id="form-title"><i class="fas fa-file-medical"></i> Configuration du Sujet</h1>
+        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+            <input type="text" id="examTitle" placeholder="Titre (ex: Examen Final Sécurité)" style="flex: 2;">
+            <input type="text" id="examMatiere" placeholder="Code Matière (ex: RSI301)" style="flex: 1;">
+            <input type="number" id="examDuration" placeholder="Durée (min)" style="width: 120px;">
+            <select id="examStatus" style="width: 150px; font-weight: bold;">
+                <option value="Actif">🟢 Actif</option>
+                <option value="Brouillon">🔴 Brouillon</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="questions-list"></div>
+
+    <button class="btn btn-add" onclick="addNewQuestion()">
+        <i class="fas fa-plus"></i> Ajouter une Question
+    </button>
+
+    <hr style="margin: 30px 0;">
+
+    <button class="btn btn-save" onclick="submitExam()">
+        <i class="fas fa-cloud-upload-alt"></i> ENREGISTRER LES MODIFICATIONS
+    </button>
+</div>
+
+<script>
+    let qCount = 0;
+    let editingId = null; 
+    const API_URL = 'http://localhost:3000/api/examen';
+
+    // Récupération des infos de l'enseignant connecté
+    const teacherData = JSON.parse(localStorage.getItem('teacherUser'));
+
+    window.onload = () => {
+        if (!teacherData) {
+            alert("Session expirée. Veuillez vous reconnecter.");
+            window.location.href = 'index.html';
+            return;
+        }
+        loadExams();
+    };
+
+    async function loadExams() {
+        try {
+            // CORRECTION : On utilise enseignantId comme paramètre d'URL
+            const res = await fetch(`${API_URL}/all?enseignantId=${teacherData._id}`);
+            const examens = await res.json();
+            const listDiv = document.getElementById('existing-exams-list');
+            listDiv.innerHTML = "";
+
+            if (examens.length === 0) {
+                listDiv.innerHTML = "<p>Aucun sujet trouvé pour votre compte.</p>";
+                return;
+            }
+
+            examens.forEach(ex => {
+                const isActif = ex.statut === 'Actif';
+                const item = document.createElement('div');
+                item.className = 'exam-item';
+                item.innerHTML = `
+                    <div class="exam-info">
+                        <strong>[${ex.codeMatiere}] ${ex.titre}</strong> 
+                        <span class="status-badge ${isActif ? 'bg-active' : 'bg-inactive'}">${ex.statut}</span><br>
+                        <small>${ex.questions.length} questions | ${ex.duree} min</small>
+                    </div>
+                    <div class="exam-actions">
+                        <button class="btn btn-toggle ${isActif ? 'btn-active' : ''}" onclick="toggleStatus('${ex._id}')" title="Changer la visibilité">
+                            <i class="fas ${isActif ? 'fa-eye' : 'fa-eye-slash'}"></i>
+                        </button>
+                        <button class="btn btn-edit" onclick='prepEdit("${ex._id}")'>
+                            <i class="fas fa-edit"></i> Modifier
+                        </button>
+                    </div>
+                `;
+                listDiv.appendChild(item);
+            });
+            window.allExams = examens;
+        } catch (err) {
+            document.getElementById('existing-exams-list').innerHTML = "<p style='color:red;'>Erreur de connexion au serveur.</p>";
+        }
+    }
+
+    function prepEdit(id) {
+        const ex = window.allExams.find(e => e._id === id);
+        if(ex) loadExamForEdit(ex);
+    }
+
+    async function toggleStatus(id) {
+        try {
+            const res = await fetch(`${API_URL}/${id}/toggle-status`, { method: 'PATCH' });
+            if(res.ok) loadExams();
+        } catch (err) { alert("Erreur lors du changement de statut."); }
+    }
+
+    function addNewQuestion() {
+        qCount++;
+        const container = document.getElementById('questions-list');
+        const div = document.createElement('div');
+        div.className = 'question-card';
+        div.id = `q-block-${qCount}`;
+        
+        div.innerHTML = `
+            <span class="type-badge" id="badge-${qCount}">Rédaction</span>
+            <h3>Question ${qCount}</h3>
+            <label>Type de question :</label>
+            <select onchange="updateType(${qCount})" id="type-${qCount}">
+                <option value="REDACTION">📝 Rédaction / Théorie</option>
+                <option value="QCM">🔘 QCM (Choix multiples)</option>
+                <option value="CODE">💻 Exercice de Programmation (Python/C)</option>
+            </select>
+            <textarea id="enonce-${qCount}" placeholder="Énoncé de la question..." rows="3"></textarea>
+            <div id="options-area-${qCount}" class="options-zone" style="display:none;">
+                <label>Options (séparées par des points-virgules) :</label>
+                <input type="text" id="opts-${qCount}" placeholder="Ex: Option A ; Option B ; Option C">
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <label>Points :</label>
+                <input type="number" id="pts-${qCount}" value="1" style="width: 70px;">
+            </div>
+            <button onclick="document.getElementById('q-block-${qCount}').remove()" style="color:red; background:none; border:none; cursor:pointer; float:right; margin-top:10px;">
+                <i class="fas fa-trash"></i> Supprimer
+            </button>
+        `;
+        container.appendChild(div);
+    }
+
+    function updateType(id) {
+        const type = document.getElementById(`type-${id}`).value;
+        const area = document.getElementById(`options-area-${id}`);
+        const badge = document.getElementById(`badge-${id}`);
+        badge.innerText = type;
+        area.style.display = (type === 'QCM') ? 'block' : 'none';
+    }
+
+    function loadExamForEdit(exam) {
+        editingId = exam._id;
+        document.getElementById('form-title').innerHTML = `<i class="fas fa-edit"></i> Modification en cours`;
+        document.getElementById('examTitle').value = exam.titre;
+        document.getElementById('examMatiere').value = exam.codeMatiere || "";
+        document.getElementById('examDuration').value = exam.duree;
+        document.getElementById('examStatus').value = exam.statut || "Brouillon";
+        
+        document.getElementById('questions-list').innerHTML = "";
+        qCount = 0;
+
+        exam.questions.forEach(q => {
+            addNewQuestion();
+            const currentId = qCount;
+            document.getElementById(`type-${currentId}`).value = q.type;
+            document.getElementById(`enonce-${currentId}`).value = q.enonce;
+            document.getElementById(`pts-${currentId}`).value = q.points;
+            if(q.type === 'QCM') {
+                document.getElementById(`options-area-${currentId}`).style.display = 'block';
+                document.getElementById(`opts-${currentId}`).value = q.options ? q.options.join(' ; ') : "";
+                document.getElementById(`badge-${currentId}`).innerText = "QCM";
+            }
+        });
+        window.scrollTo({ top: document.getElementById('form-title').offsetTop - 20, behavior: 'smooth' });
+    }
+
+    async function submitExam() {
+        const title = document.getElementById('examTitle').value;
+        const codeMatiere = document.getElementById('examMatiere').value;
+        const duration = document.getElementById('examDuration').value;
+        const statut = document.getElementById('examStatus').value;
+
+        if(!title || !duration || !codeMatiere) return alert("Champs obligatoires manquants !");
+
+        const questions = [];
+        document.querySelectorAll('.question-card').forEach((block) => {
+            const realId = block.id.split('-').pop();
+            const type = document.getElementById(`type-${realId}`).value;
+            const optsInput = document.getElementById(`opts-${realId}`);
+            
+            questions.push({
+                type: type,
+                enonce: document.getElementById(`enonce-${realId}`).value,
+                options: (type === 'QCM' && optsInput.value) ? optsInput.value.split(';').map(s => s.trim()) : [],
+                points: parseInt(document.getElementById(`pts-${realId}`).value)
+            });
+        });
+
+        // CORRECTION : Correspondance exacte avec ton modèle Mongoose
+        const fullData = { 
+            titre: title, 
+            codeMatiere: codeMatiere, 
+            duree: duration, 
+            statut: statut, 
+            questions: questions,
+            enseignantId: teacherData._id,
+            enseignantNom: teacherData.nom 
+        };
+        
+        let url = `${API_URL}/create`;
+        let method = 'POST';
+
+        if(editingId) {
+            url = `${API_URL}/update/${editingId}`;
+            method = 'PUT';
+        }
+
+        try {
+            const res = await fetch(url, {
+                method: method,
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(fullData)
+            });
+
+            if(res.ok) {
+                alert("Sauvegarde réussie !");
+                location.reload(); 
+            } else {
+                const errData = await res.json();
+                alert("Erreur: " + errData.message);
+            }
+        } catch (err) { alert("Serveur injoignable."); }
+    }
+</script>
+</body>
+</html>

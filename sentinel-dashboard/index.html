@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel | Dashboard Login</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --error: #e74c3c;
+            --success: #27ae60;
+            --bg: #f5f6fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .logo { font-size: 2rem; font-weight: bold; color: var(--primary); margin-bottom: 10px; }
+        .logo span { color: var(--accent); }
+        h2 { color: #7f8c8d; font-weight: 400; margin-bottom: 30px; }
+        .form-group { text-align: left; margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: var(--primary); font-weight: 600; }
+        input {
+            width: 100%; padding: 12px; border: 1px solid #dcdde1;
+            border-radius: 6px; box-sizing: border-box;
+        }
+        button {
+            width: 100%; padding: 14px; background-color: var(--primary);
+            color: white; border: none; border-radius: 6px;
+            font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.3s;
+        }
+        button:hover { background-color: #1a252f; }
+        #status-message { margin-top: 20px; padding: 10px; border-radius: 4px; display: none; }
+        .error { background: #fadbd8; color: var(--error); display: block !important; }
+        .success { background: #d4efdf; color: var(--success); display: block !important; }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <div class="logo">SENTINEL<span>.</span></div>
+    <h2>Accès Dashboard</h2>
+
+    <div class="form-group">
+        <label for="matricule">Matricule</label>
+        <input type="text" id="matricule" placeholder="Ex: ADMIN01" required>
+    </div>
+
+    <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <input type="password" id="password" placeholder="••••••••" required>
+    </div>
+
+    <button onclick="handleLogin()">Se connecter</button>
+
+    <div id="status-message"></div>
+</div>
+
+<script>
+    async function handleLogin() {
+        const matricule = document.getElementById('matricule').value;
+        const password = document.getElementById('password').value;
+        const statusMsg = document.getElementById('status-message');
+
+        // Reset message
+        statusMsg.style.display = 'none';
+        statusMsg.className = '';
+
+        if (!matricule || !password) {
+            showStatus("Veuillez remplir tous les champs", "error");
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:3000/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    matricule, 
+                    password,
+                    macAddress: "DASHBOARD-WEB" 
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                const userRole = data.user.role;
+                showStatus(`Bienvenue ${data.user.nom} (${userRole})`, "success");
+                
+                // --- CRUCIAL : On utilise 'teacherUser' pour que dash-teacher.html puisse te reconnaître ---
+                localStorage.setItem('teacherUser', JSON.stringify(data.user));
+
+                // Redirection après un court délai pour laisser l'utilisateur voir le message
+                setTimeout(() => {
+                    if (userRole === 'Admin') {
+                        window.location.href = 'dash-admin.html';
+                    } 
+                    else if (userRole === 'Enseignant') {
+                        // Redirection vers ton fichier dash-teacher.html
+                        window.location.href = 'dash-teacher.html';
+                    } 
+                    else {
+                        alert("Accès restreint aux terminaux d'examen.");
+                    }
+                }, 1200);
+
+            } else {
+                showStatus(data.message || "Erreur d'authentification", "error");
+            }
+        } catch (err) {
+            console.error(err);
+            showStatus("Le serveur Sentinel ne répond pas.", "error");
+        }
+    }
+
+    function showStatus(text, type) {
+        const statusMsg = document.getElementById('status-message');
+        statusMsg.innerText = text;
+        statusMsg.className = type;
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Sentinel | Importation Étudiants</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #2c3e50; --accent: #3498db; --success: #27ae60; --bg: #f5f6fa; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        
+        .selection-box { margin-bottom: 25px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 5px solid var(--accent); }
+        select { width: 100%; padding: 12px; border-radius: 5px; border: 1px solid #ddd; font-size: 1rem; margin-top: 10px; }
+        
+        .upload-zone { border: 2px dashed var(--accent); padding: 40px; text-align: center; border-radius: 10px; background: #f9fcff; cursor: pointer; transition: 0.3s; }
+        .upload-zone:hover { background: #eef7ff; }
+        
+        .btn { padding: 15px 25px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; background: var(--success); color: white; width: 100%; margin-top: 20px; font-size: 1rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: var(--primary); color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1><i class="fas fa-users-cog"></i> Gestion des Étudiants</h1>
+    
+    <div class="selection-box">
+        <h2><i class="fas fa-book"></i> 1. Choisir la matière</h2>
+        <select id="selectMatiere">
+            <option value="RSI301">RSI301 - Sécurité Informatique</option>
+            <option value="RSI302">RSI302 - Développement Web</option>
+            <option value="RSI303">RSI303 - Administration Réseau</option>
+        </select>
+    </div>
+
+    <h2><i class="fas fa-file-import"></i> 2. Téléverser le fichier CSV</h2>
+    <p>Format attendu : Nom, Matricule, Email</p>
+    
+    <div class="upload-zone" onclick="document.getElementById('csvFile').click()">
+        <i class="fas fa-file-csv fa-3x" style="color: var(--accent);"></i>
+        <p>Cliquez ou glissez le fichier CSV ici</p>
+        <input type="file" id="csvFile" style="display:none" accept=".csv" onchange="previewCSV()">
+    </div>
+
+    <div id="preview-area" style="display:none;">
+        <h3>Aperçu des données pour <span id="targetMatiere" style="color:var(--accent)"></span></h3>
+        <table id="csv-table">
+            <thead><tr><th>Nom</th><th>Matricule</th><th>Email</th></tr></thead>
+            <tbody></tbody>
+        </table>
+        <button class="btn" onclick="uploadStudents()">🔥 CONFIRMER L'IMPORTATION MASSIVE</button>
+    </div>
+</div>
+
+<script>
+    let studentData = [];
+
+    function previewCSV() {
+        const file = document.getElementById('csvFile').files[0];
+        const matiere = document.getElementById('selectMatiere').value;
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            const text = e.target.result;
+            const rows = text.split('\n');
+            const tbody = document.querySelector('#csv-table tbody');
+            tbody.innerHTML = "";
+            studentData = [];
+
+            rows.forEach((row, index) => {
+                if (index === 0 || row.trim() === "") return; 
+                const cols = row.split(',');
+                if (cols.length >= 2) {
+                    studentData.push({ 
+                        nom: cols[0].trim(), 
+                        matricule: cols[1].trim(), 
+                        email: cols[2] ? cols[2].trim() : "" 
+                    });
+                    tbody.innerHTML += `<tr><td>${cols[0]}</td><td>${cols[1]}</td><td>${cols[2] || ''}</td></tr>`;
+                }
+            });
+            document.getElementById('targetMatiere').innerText = matiere;
+            document.getElementById('preview-area').style.display = 'block';
+        };
+        reader.readAsText(file);
+    }
+
+    async function uploadStudents() {
+        const selectedMatiere = document.getElementById('selectMatiere').value;
+        
+        const res = await fetch('http://localhost:3000/api/auth/import-students', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ 
+                students: studentData,
+                codeMatiere: selectedMatiere // On envoie le code matière au backend
+            })
+        });
+
+        if(res.ok) {
+            alert(`✅ Succès ! ${studentData.length} étudiants inscrits au cours ${selectedMatiere}.`);
+            window.location.href = 'dash-teacher.html';
+        } else {
+            alert("❌ Erreur lors de l'importation. Vérifiez la console.");
+        }
+    }
+</script>
+</body>
+</html>
