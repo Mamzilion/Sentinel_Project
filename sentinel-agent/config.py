@@ -1,0 +1,9 @@
+# --- CONFIGURATION RÉSEAU ---
+API_BASE_URL = "http://localhost:3000/api"
+
+# --- CONFIGURATION UI ---
+APP_TITLE = "SENTINEL v2 - IUT Ngaoundéré"
+WINDOW_SIZE = "500x550"
+BG_COLOR = "#f5f6fa"
+HEADER_COLOR = "#2c3e50"
+PRIMARY_BUTTON = "#3498db"
